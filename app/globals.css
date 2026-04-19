@@ -1,0 +1,321 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --brand-primary: #002548;
+    --brand-secondary: #95bb72;
+    --brand-bg: #f4f7eb;
+    --brand-section-bg: #ffffff;
+    --brand-text: #191c1d;
+    --brand-text-on-primary: #ffffff;
+    --brand-border: #dde6cb;
+
+    --font-montserrat: var(--font-montserrat);
+    --font-open-sans: var(--font-open-sans);
+    --font-prompt: var(--font-prompt);
+    --font-admin: var(--font-kanit), "Maitree", serif;
+  }
+
+  [data-theme='gold'] {
+    --brand-primary: #8c734b;
+    --brand-secondary: #d4af37;
+    --brand-bg: #faf9f6;
+    --brand-section-bg: #ffffff;
+    --brand-text: #2c2a26;
+    --brand-border: #e8e1d3;
+  }
+
+  * {
+    border-color: var(--brand-border);
+  }
+
+  body {
+    background-color: var(--brand-bg);
+    color: var(--brand-text);
+  }
+
+  /* Global Typography - Following Premium Standards */
+  body {
+    font-family: var(--font-open-sans), var(--font-prompt), sans-serif;
+    font-size: 1rem;
+    line-height: 1.8;
+  }
+
+  @media (min-width: 768px) {
+    body {
+      font-size: 1.125rem;
+    }
+  }
+
+  h1 {
+    font-family: var(--font-montserrat), var(--font-prompt), sans-serif;
+    font-size: 2.25rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  @media (min-width: 768px) {
+    h1 {
+      font-size: 4.5rem;
+    }
+  }
+
+  h2 {
+    font-family: var(--font-montserrat), var(--font-prompt), sans-serif;
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  @media (min-width: 768px) {
+    h2 {
+      font-size: 3rem;
+    }
+  }
+
+  /* Language Specific Font Weight Adjustments */
+  html[lang="th"] body {
+    font-family: var(--font-prompt), var(--font-open-sans), sans-serif;
+  }
+
+  html[lang="th"] h1, 
+  html[lang="th"] h2, 
+  html[lang="th"] h3, 
+  html[lang="th"] h4 {
+    font-family: var(--font-prompt), var(--font-montserrat), sans-serif;
+  }
+
+  /* Admin Specific - Kanit Font Support */
+  .font-kanit {
+    font-family: var(--font-kanit), sans-serif !important;
+  }
+
+  .admin-theme {
+    background: #f3f6fb;
+    color: #0f172a;
+    font-family: var(--font-admin) !important;
+  }
+
+  .admin-theme h1,
+  .admin-theme h2,
+  .admin-theme h3,
+  .admin-theme h4,
+  .admin-theme h5,
+  .admin-theme h6,
+  .admin-theme p,
+  .admin-theme span,
+  .admin-theme a,
+  .admin-theme label,
+  .admin-theme li,
+  .admin-theme td,
+  .admin-theme th,
+  .admin-theme small,
+  .admin-theme strong {
+    font-family: var(--font-admin) !important;
+  }
+
+  .admin-theme .font-kanit,
+  .admin-theme input,
+  .admin-theme textarea,
+  .admin-theme select,
+  .admin-theme button {
+    font-family: var(--font-admin) !important;
+  }
+
+  .admin-theme .text-slate-300 {
+    color: #64748b !important;
+  }
+
+  .admin-theme .text-slate-400 {
+    color: #475569 !important;
+  }
+
+  .admin-theme .text-slate-500 {
+    color: #334155 !important;
+  }
+
+  .admin-theme p.text-slate-400,
+  .admin-theme p.text-slate-500,
+  .admin-theme .text-xs {
+    font-weight: 600 !important;
+    letter-spacing: 0.01em;
+  }
+
+  .admin-theme .text-xs {
+    font-size: 0.82rem !important;
+  }
+
+  .admin-theme .border-slate-50 {
+    border-color: #dbe4ee !important;
+  }
+
+  .admin-theme .border-slate-100 {
+    border-color: #cbd5e1 !important;
+  }
+
+  .admin-theme .border-slate-200 {
+    border-color: #94a3b8 !important;
+  }
+
+  .admin-theme .ring-slate-50 {
+    --tw-ring-color: rgba(148, 163, 184, 0.2) !important;
+  }
+
+  .admin-theme .ring-slate-100 {
+    --tw-ring-color: rgba(148, 163, 184, 0.28) !important;
+  }
+
+  .admin-theme .bg-slate-50,
+  .admin-theme .bg-slate-50\/20,
+  .admin-theme .bg-slate-50\/30,
+  .admin-theme .bg-slate-50\/50,
+  .admin-theme .bg-slate-50\/60 {
+    background-color: #eef3f9 !important;
+  }
+
+  .admin-theme .bg-white {
+    background-color: #ffffff !important;
+  }
+
+  .admin-theme .bg-white.border,
+  .admin-theme .rounded-\[3rem\].border,
+  .admin-theme .rounded-\[2\.5rem\].border,
+  .admin-theme .rounded-\[2rem\].border,
+  .admin-theme .rounded-\[1\.5rem\].border {
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.06) !important;
+  }
+
+  .admin-theme input,
+  .admin-theme textarea,
+  .admin-theme select {
+    border: 1px solid #cbd5e1 !important;
+    background-color: #f8fbff !important;
+    color: #0f172a !important;
+    box-shadow: inset 0 1px 2px rgba(148, 163, 184, 0.12) !important;
+  }
+
+  .admin-theme input::placeholder,
+  .admin-theme textarea::placeholder {
+    color: #64748b !important;
+  }
+
+  .admin-theme input:focus,
+  .admin-theme textarea:focus,
+  .admin-theme select:focus {
+    border-color: #002548 !important;
+    box-shadow: 0 0 0 4px rgba(0, 37, 72, 0.08), inset 0 1px 2px rgba(148, 163, 184, 0.12) !important;
+    outline: none !important;
+  }
+
+  .admin-theme .shadow-sm {
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06) !important;
+  }
+
+  .admin-theme .shadow-lg,
+  .admin-theme .shadow-xl,
+  .admin-theme .shadow-2xl {
+    box-shadow: 0 18px 42px rgba(15, 23, 42, 0.12) !important;
+  }
+
+  /* Custom Scrollbar for Admin Panel */
+  .admin-sidebar-scroll {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .admin-sidebar-scroll::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #E2E8F0;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #CBD5E1;
+  }
+
+  /* Support for tailwind font-family name variables if used */
+  .font-\[family-name\:var\(--font-montserrat\)\] {
+    font-family: var(--font-montserrat), var(--font-prompt), sans-serif !important;
+  }
+
+  .font-\[family-name\:var\(--font-open-sans\)\] {
+    font-family: var(--font-open-sans), var(--font-prompt), sans-serif !important;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .reveal-delayed-1 { animation-delay: 0.1s; }
+  .reveal-delayed-2 { animation-delay: 0.2s; }
+  .reveal-delayed-3 { animation-delay: 0.3s; }
+
+  /* Premium Modal Animations */
+  @keyframes modal-backdrop-in {
+    from { opacity: 0; backdrop-filter: blur(0px); }
+    to { opacity: 1; backdrop-filter: blur(12px); }
+  }
+
+  @keyframes modal-content-in {
+    0% { opacity: 0; transform: scale(0.94) translateY(30px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  @keyframes modal-content-out {
+    0% { opacity: 1; transform: scale(1) translateY(0); }
+    100% { opacity: 0; transform: scale(0.97) translateY(15px); }
+  }
+
+  .animate-modal-backdrop {
+    animation: modal-backdrop-in 0.4s ease-out forwards;
+  }
+
+  .animate-modal-content {
+    animation: modal-content-in 0.5s cubic-bezier(0.2, 1, 0.3, 1) forwards;
+  }
+
+  .animate-modal-content-out {
+    animation: modal-content-out 0.4s cubic-bezier(0.2, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes logistics-arc-dash {
+    0% {
+      stroke-dashoffset: 180;
+    }
+    100% {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes logistics-marker-pulse {
+    0% {
+      transform: scale(0.95) translateZ(0);
+      opacity: 0.8;
+    }
+    50% {
+      transform: scale(1.22) translateZ(0);
+      opacity: 0.35;
+    }
+    100% {
+      transform: scale(0.95) translateZ(0);
+      opacity: 0.8;
+    }
+  }
+}
+
+@theme inline {
+  --font-sans: var(--font-open-sans);
+}

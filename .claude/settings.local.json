@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(node:*)",
+      "Bash(npx eslint:*)",
+      "Bash(xargs grep:*)",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebSearch",
+      "WebFetch(domain:www.react-simple-maps.io)",
+      "Bash(npm install:*)",
+      "WebFetch(domain:community.cloudflare.com)",
+      "WebFetch(domain:developers.cloudflare.com)",
+      "WebFetch(domain:www.cloudflare.com)",
+      "WebFetch(domain:server.hk)",
+      "WebFetch(domain:www.cdn07.com)",
+      "WebFetch(domain:lowendtalk.com)",
+      "Bash(dir \"C:\\\\Users\\\\Riew\\\\Downloads\\\\website-AOT-main\\\\website-AOT-main\\\\app\")",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__query-docs"
+    ]
+  }
+}
