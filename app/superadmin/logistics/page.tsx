@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { AdminPortal } from "@/components/admin-portal";
 import { CmsAssetUploadButton } from "@/components/cms-asset-upload-button";
-import { XCircle } from "lucide-react";
+import { CmsSaveToast, type CmsSaveStatus } from "@/components/cms-save-toast";
+import { savePageContent } from "@/lib/actions";
 
 type Locale = "th" | "en" | "zh";
 
@@ -197,7 +197,21 @@ export default function LogisticsAdmin() {
   const [activeLang, setActiveLang] = useState<Locale>("th");
   const [content, setContent] = useState<LogisticsContent>(defaultContent);
   const [isLoading, setIsLoading] = useState(true);
-  const [saveStatus, setSaveStatus] = useState<"idle" | "confirming" | "saving" | "success" | "error">("idle");
+  const [saveStatus, setSaveStatus] = useState<CmsSaveStatus>("idle");
+  const [adminLang, setAdminLang] = useState<string>("th");
+
+  useEffect(() => {
+    const getLang = () => {
+      if (typeof window !== "undefined") {
+        return localStorage.getItem("admin_lang") || "th";
+      }
+      return "th";
+    };
+    setAdminLang(getLang());
+    const handleLangChange = () => setAdminLang(getLang());
+    window.addEventListener("admin_lang_changed", handleLangChange);
+    return () => window.removeEventListener("admin_lang_changed", handleLangChange);
+  }, []);
 
   useEffect(() => {
     async function fetchData() {
@@ -280,23 +294,11 @@ export default function LogisticsAdmin() {
 
   const handleSave = async () => {
     setSaveStatus("saving");
-    try {
-      const { error } = await supabase.from("page_content").upsert(
-        {
-          page_name: "logistics",
-          content,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "page_name" },
-      );
+    const result = await savePageContent("logistics", content);
 
-      if (error) {
-        throw error;
-      }
-
+    if (result.success) {
       setSaveStatus("success");
-    } catch (error) {
-      console.error("Error saving logistics content:", error);
+    } else {
       setSaveStatus("error");
     }
   };
@@ -325,32 +327,19 @@ export default function LogisticsAdmin() {
         </div>
       </section>
 
-      <button onClick={() => setSaveStatus("confirming")} className="fixed bottom-4 right-4 md:bottom-6 md:right-6 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center shadow-2xl z-50 transition-all hover:-translate-y-2 active:scale-90 bg-[#002548] text-white hover:bg-slate-800" title="Save">
+      <button onClick={handleSave} className="fixed bottom-4 right-4 md:bottom-6 md:right-6 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center shadow-2xl z-50 transition-all hover:-translate-y-2 active:scale-90 bg-[#002548] text-white hover:bg-slate-800" title="Save">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
       </button>
 
-      <AdminPortal>
-        <div className={`fixed inset-0 z-[9999] flex items-center justify-center p-4 transition-all duration-500 ${saveStatus !== "idle" ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}>
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-xl" onClick={() => saveStatus !== "saving" && setSaveStatus("idle")}></div>
-          <div className="relative w-full max-w-sm bg-white rounded-[2.5rem] p-10 shadow-2xl text-center">
-            {saveStatus === "confirming" && (
-              <div className="space-y-8 py-2">
-                <div>
-                  <h3 className="text-xl font-bold text-slate-800">ยืนยันการบันทึก?</h3>
-                  <p className="text-slate-500 mt-2 text-sm font-medium leading-relaxed px-4">บันทึกข้อมูลหน้า Logistics ลงฐานข้อมูล</p>
-                </div>
-                <div className="flex gap-3">
-                  <button onClick={() => setSaveStatus("idle")} className="flex-1 py-3 rounded-2xl font-bold text-slate-400 hover:bg-slate-50 transition-colors text-sm uppercase tracking-widest">ยกเลิก</button>
-                  <button onClick={handleSave} className="flex-1 py-3 bg-[#002548] text-white rounded-2xl font-bold shadow-lg hover:bg-slate-800 transition-all text-sm uppercase tracking-widest">บันทึก</button>
-                </div>
-              </div>
-            )}
-            {saveStatus === "saving" && <div className="space-y-6 py-6"><div className="w-16 h-16 border-4 border-[#002548]/10 border-t-[#002548] rounded-full animate-spin mx-auto"></div><p className="text-[#002548] font-bold animate-pulse uppercase tracking-widest text-sm">Saving...</p></div>}
-            {saveStatus === "success" && <div className="space-y-8 py-2"><div><h3 className="text-xl font-bold text-slate-800">บันทึกเรียบร้อย</h3><p className="text-slate-500 mt-2 text-sm font-medium leading-relaxed px-4">หน้า Logistics จะอ่านข้อมูลชุดนี้ทันที</p></div><button onClick={() => setSaveStatus("idle")} className="w-full py-3 bg-[#002548] text-white rounded-2xl font-bold shadow-lg hover:bg-slate-800 transition-all text-sm uppercase tracking-widest">ตกลง</button></div>}
-            {saveStatus === "error" && <div className="space-y-6"><div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto"><XCircle className="w-9 h-9" /></div><div><h3 className="text-xl font-bold text-slate-800">เกิดข้อผิดพลาด</h3><p className="text-slate-500 mt-2 text-sm font-medium leading-relaxed px-4">ไม่สามารถบันทึกข้อมูลได้</p></div></div>}
-          </div>
-        </div>
-      </AdminPortal>
+      <CmsSaveToast
+        status={saveStatus}
+        onClear={() => setSaveStatus("idle")}
+        messages={{
+          saving: { th: "กำลังบันทึกข้อมูลหน้าโลจิสติกส์...", en: "Saving Logistics page changes...", zh: "正在保存物流页内容..." }[adminLang as "th" | "en" | "zh"] || "Saving...",
+          success: { th: "บันทึกข้อมูลหน้าโลจิสติกส์เรียบร้อยแล้ว", en: "Logistics page saved successfully.", zh: "物流页内容保存成功。" }[adminLang as "th" | "en" | "zh"] || "Saved.",
+          error: { th: "ไม่สามารถบันทึกข้อมูลหน้าโลจิสติกส์ได้", en: "Unable to save the Logistics page.", zh: "无法保存物流页内容。" }[adminLang as "th" | "en" | "zh"] || "Error.",
+        }}
+      />
 
       <LanguageTabs activeLang={activeLang} onChange={setActiveLang} />
 
@@ -462,3 +451,4 @@ export default function LogisticsAdmin() {
     </div>
   );
 }
+

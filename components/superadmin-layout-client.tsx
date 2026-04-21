@@ -196,7 +196,7 @@ export function SuperAdminLayoutClient({
           <div className="flex items-center gap-3.5 p-2 rounded-2xl hover:bg-white/[0.03] transition-all">
             <div className="relative flex-shrink-0">
               <div className="w-10 h-10 rounded-full flex items-center justify-center bg-slate-100 overflow-hidden border border-white/10 relative">
-                <Image src="/images/admin-avatar.jpg" alt="Admin" fill className="object-cover" unoptimized />
+                <Image src="/images/admin-avatar.jpg" alt="Admin" fill sizes="40px" className="object-cover" unoptimized />
               </div>
             </div>
             <div className="min-w-0">
@@ -245,19 +245,33 @@ export function SuperAdminLayoutClient({
           </div>
 
           <div className="flex items-center gap-8">
-            <Link href="/" className="text-[10px] font-bold text-[#002548] uppercase tracking-[0.2em]">{t.viewSite}</Link>
             <div ref={langRef} className="relative">
-              <button onClick={() => setIsLangOpen(!isLangOpen)} className="flex items-center gap-2">
-                <div className="relative h-7 w-7 overflow-hidden rounded-full ring-2 ring-slate-100 shadow-sm">
-                  <Image src={currentLang.flag} alt={currentLang.label} fill className="object-cover" />
+              <button onClick={() => setIsLangOpen(!isLangOpen)} className="flex items-center gap-2 group">
+                <div className="relative h-7 w-7 overflow-hidden rounded-full ring-2 ring-slate-100 shadow-sm transition-all group-hover:ring-[#D4AF37]/30">
+                  <Image src={currentLang.flag} alt={currentLang.label} fill sizes="28px" className="object-cover" />
                 </div>
+                <span
+                  aria-hidden="true"
+                  className={`text-slate-400 transition-transform duration-300 ${isLangOpen ? "rotate-180" : ""}`}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    className="h-3 w-3"
+                  >
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </span>
               </button>
               <div className={`absolute right-0 top-full mt-3 min-w-[110px] rounded-2xl bg-white p-1.5 shadow-2xl border border-slate-100 transition-all ${
                 isLangOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
               }`}>
                 {languages.map((l) => (
                   <button key={l.code} onClick={() => { setLang(l.code); localStorage.setItem("admin_lang", l.code); setIsLangOpen(false); window.dispatchEvent(new Event("admin_lang_changed")); }} className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 transition-all ${lang === l.code ? "bg-slate-50 text-[#002548]" : "text-slate-500 hover:bg-slate-50 hover:text-[#002548]"}`}>
-                    <div className="relative h-5 w-5 shrink-0 overflow-hidden rounded-full shadow-inner"><Image src={l.flag} alt={l.label} fill className="object-cover" /></div>
+                    <div className="relative h-5 w-5 shrink-0 overflow-hidden rounded-full shadow-inner"><Image src={l.flag} alt={l.label} fill sizes="20px" className="object-cover" /></div>
                     <span className="text-[10px] font-bold tracking-widest">{l.label}</span>
                   </button>
                 ))}

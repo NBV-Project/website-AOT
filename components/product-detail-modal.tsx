@@ -274,18 +274,11 @@ export function ProductDetailModal({ isOpen, onClose, productId, locale }: Produ
             alt={product.title}
             fill
             priority
+            sizes="(max-width: 768px) 100vw, 50vw"
             className={`object-cover transition-transform duration-1000 ease-out ${isOpen ? "scale-100" : "scale-110"} ${product.is_in_season === false ? "grayscale-[0.4]" : ""}`}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent md:hidden" />
           
-          {/* Seasonal Badge on Image */}
-          {product.is_in_season === false && (
-            <div className="absolute left-6 top-6 z-10">
-              <span className="inline-flex rounded-full bg-red-500 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-white shadow-lg">
-                {locale === "th" ? "นอกฤดูกาล" : locale === "zh" ? "非产季" : "Out of Season"}
-              </span>
-            </div>
-          )}
         </div>
 
         {/* Right Side: Text Content */}
@@ -313,11 +306,6 @@ export function ProductDetailModal({ isOpen, onClose, productId, locale }: Produ
             <span className={`inline-flex rounded-full px-4 py-1 text-[10px] font-bold uppercase tracking-widest ${product.is_in_season === false ? "bg-slate-100 text-slate-400" : "bg-[#95bb72]/10 text-[#6f9152]"}`}>
               {locale === "th" ? "รายละเอียดสินค้า" : locale === "zh" ? "产品详情" : "Product Details"}
             </span>
-            {product.price_range && (
-               <span className="inline-flex rounded-full bg-amber-50 px-4 py-1 text-[10px] font-bold uppercase tracking-widest text-amber-600 border border-amber-100">
-                {product.price_range}
-              </span>
-            )}
           </div>
 
           <h2 className="mt-4 font-[family-name:var(--font-montserrat)] text-4xl font-bold tracking-[-0.02em] text-[var(--brand-primary)] sm:text-5xl">
@@ -343,7 +331,7 @@ export function ProductDetailModal({ isOpen, onClose, productId, locale }: Produ
               <ul className="mt-3 space-y-2">
                 {product.benefits.map((benefit) => (
                   <li key={benefit} className="flex items-center gap-3 text-sm text-slate-600">
-                    <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] text-white ${product.is_in_season === false ? "bg-slate-300" : "bg-[#95bb72]"}`}>
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] text-white bg-[#95bb72]">
                       ✓
                     </span>
                     {benefit}

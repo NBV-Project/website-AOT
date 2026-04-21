@@ -15,6 +15,7 @@ type CmsAssetUploadButtonProps = {
   label?: string;
   onUploaded: (publicUrl: string) => void;
   pathPrefix?: string;
+  sizes?: string;
 };
 
 function slugifyFilename(name: string) {
@@ -38,6 +39,7 @@ export function CmsAssetUploadButton({
   label = "อัปโหลดรูปใหม่",
   onUploaded,
   pathPrefix = "cms",
+  sizes = "100vw",
 }: CmsAssetUploadButtonProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -78,7 +80,7 @@ export function CmsAssetUploadButton({
 
       <div className="group relative overflow-hidden rounded-2xl bg-slate-100">
         <div className={`relative w-full ${aspectClassName}`}>
-          <Image src={src} alt={alt} fill className={imageClassName} />
+          <Image src={src} alt={alt} fill sizes={sizes} className={imageClassName} />
 
           <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100">
             <button

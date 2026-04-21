@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import { unstable_cache } from "next/cache";
 
 import { SiteFooter } from "@/components/site-footer";
@@ -11,7 +10,6 @@ import {
   type Locale,
   navigationByLocale,
   resolveLocale,
-  withLang,
 } from "@/lib/locale";
 import { supabase } from "@/lib/supabase";
 
@@ -228,7 +226,16 @@ export default async function ContactPage({ searchParams }: ContactProps) {
 
         <section className="relative h-screen min-h-[600px] overflow-hidden bg-[var(--brand-primary)]">
           <div className="absolute inset-0">
-            <Image src={images.hero} alt="Contact hero" fill priority sizes="100vw" className="object-cover" />
+            <Image 
+              src={images.hero} 
+              alt="Contact hero" 
+              fill 
+              priority 
+              sizes="100vw" 
+              className="object-cover" 
+              loading="eager"
+              quality={90}
+            />
             <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.64)_0%,rgba(0,0,0,0.32)_38%,rgba(0,0,0,0.08)_100%)]" />
           </div>
 
@@ -251,12 +258,6 @@ export default async function ContactPage({ searchParams }: ContactProps) {
                 >
                   {copy.primaryCta}
                 </a>
-                <Link
-                  href={withLang("/products", lang)}
-                  className="inline-flex min-w-[9.5rem] items-center justify-center rounded-md border-2 border-white bg-transparent px-7 py-4 text-center font-[family-name:var(--font-montserrat)] text-base font-medium text-white transition duration-300 hover:-translate-y-0.5 hover:bg-white hover:text-[var(--brand-primary)] hover:shadow-md"
-                >
-                  {copy.secondaryCta}
-                </Link>
               </div>
             </div>
           </div>
@@ -295,8 +296,9 @@ export default async function ContactPage({ searchParams }: ContactProps) {
                     src={images.office}
                     alt={copy.officeTitle}
                     fill
-                    sizes="(max-width: 1024px) 100vw, 42vw"
+                    sizes="(max-width: 1024px) 100vw, (max-width: 1536px) 38vw, 580px"
                     className="object-cover transition duration-700 hover:scale-[1.02]"
+                    quality={85}
                   />
                 </div>
               </div>
@@ -305,15 +307,8 @@ export default async function ContactPage({ searchParams }: ContactProps) {
                 <h4 className="font-[family-name:var(--font-montserrat)] text-2xl font-semibold tracking-[-0.02em] text-[var(--brand-primary)]">
                   {copy.supportTitle}
                 </h4>
-                <p className="mt-4 text-base leading-[1.7] text-slate-500">{copy.supportBody}</p>
-                <Link
-                  href={withLang("/logistics", lang)}
-                  className="mt-6 inline-flex items-center gap-2 border-b-2 border-[#002548]/15 pb-1 font-[family-name:var(--font-montserrat)] text-base font-medium text-[var(--brand-primary)] transition hover:border-[#002548]"
-                >
-                  {copy.secondaryCta}
-                  <span aria-hidden="true">↗</span>
-                </Link>
-              </div>
+                  <p className="mt-4 text-base leading-[1.7] text-slate-500">{copy.supportBody}</p>
+                </div>
             </div>
           </div>
         </section>

@@ -206,7 +206,7 @@ export function HighlightModal({ isOpen, onClose, highlightId, locale, details }
         }`}
       >
         <div className="relative h-48 w-full shrink-0 overflow-hidden md:h-64">
-          <Image src={data.image} alt={data.title} fill className="object-cover" />
+          <Image src={data.image} alt={data.title} fill sizes="(max-width: 672px) 100vw, 672px" className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-[var(--brand-bg)] via-transparent to-transparent" />
 
           <button
@@ -259,12 +259,6 @@ export function HighlightModal({ isOpen, onClose, highlightId, locale, details }
             ))}
           </div>
 
-          <button
-            onClick={onClose}
-            className="mt-10 w-full rounded-xl bg-[var(--brand-primary)] py-4 font-bold text-white shadow-lg transition duration-300 hover:-translate-y-1 hover:brightness-110 active:scale-[0.98]"
-          >
-            {locale === "th" ? "เข้าใจแล้ว" : locale === "zh" ? "我明白了" : "Got it"}
-          </button>
         </div>
       </div>
     </div>

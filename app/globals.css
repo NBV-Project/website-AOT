@@ -218,6 +218,8 @@
   }
 
   /* Custom Scrollbar for Admin Panel */
+
+  /* Custom Scrollbar for Admin Panel */
   .admin-sidebar-scroll {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -228,6 +230,7 @@
     height: 0;
     display: none;
   }
+  
   .custom-scrollbar::-webkit-scrollbar-track {
     background: transparent;
   }
@@ -248,20 +251,30 @@
     font-family: var(--font-open-sans), var(--font-prompt), sans-serif !important;
   }
 
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
   .reveal {
-    opacity: 1;
-    transform: translateY(0);
+    animation: fade-up 0.72s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .reveal-delayed-1 { animation: fade-up 0.72s 0.1s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .reveal-delayed-2 { animation: fade-up 0.72s 0.2s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .reveal-delayed-3 { animation: fade-up 0.72s 0.3s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+  /* Scroll Reveal System */
+  .reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(30px);
     transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  .reveal.active {
+  .reveal-on-scroll.active-reveal {
     opacity: 1;
     transform: translateY(0);
   }
-
-  .reveal-delayed-1 { animation-delay: 0.1s; }
-  .reveal-delayed-2 { animation-delay: 0.2s; }
-  .reveal-delayed-3 { animation-delay: 0.3s; }
 
   /* Premium Modal Animations */
   @keyframes modal-backdrop-in {

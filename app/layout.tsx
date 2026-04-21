@@ -17,22 +17,30 @@ function getMetadataBase() {
   return new URL(fallbackSiteUrl);
 }
 
-const prompt = Prompt({
-  weight: ["300", "400", "500", "600", "700"],
-  subsets: ["thai", "latin"],
-  display: "swap",
-  variable: "--font-prompt",
-});
-
+// Montserrat: preload=true since it's used on every hero h1/h2 (LCP font)
 const montserrat = Montserrat({
   subsets: ["latin"],
   variable: "--font-montserrat",
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "600", "700", "800"],
+  display: "swap",
+  preload: true,
 });
 
+// Prompt: Thai script — preload only the weights actually used
+const prompt = Prompt({
+  weight: ["400", "600", "700"],
+  subsets: ["thai", "latin"],
+  display: "swap",
+  variable: "--font-prompt",
+  preload: true, // Thai hero text is part of LCP on localized pages
+});
+
+// Open Sans: body text — subset to latin only, swap display
 const openSans = Open_Sans({
   subsets: ["latin"],
   variable: "--font-open-sans",
+  display: "swap",
+  preload: false,
 });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -82,11 +90,15 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="th" className={`${prompt.variable} ${montserrat.variable} ${openSans.variable} scroll-smooth`} suppressHydrationWarning>
+    <html lang="th" className={`${prompt.variable} ${montserrat.variable} ${openSans.variable} scroll-smooth`} data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         {/* Preconnect to Supabase to speed up DB fetching in China/HK */}
         {supabaseUrl ? <link rel="preconnect" href={supabaseUrl} /> : null}
         {supabaseUrl ? <link rel="dns-prefetch" href={supabaseUrl} /> : null}
+
+        {/* Preconnect to Google Fonts for faster font loading */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
 
         {/* China Browser Engine Rendering Compatibility */}
         <meta name="renderer" content="webkit" />

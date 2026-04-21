@@ -212,7 +212,15 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
         <section className="relative h-screen min-h-[600px] overflow-hidden bg-[var(--brand-primary)]">
           <div className="absolute inset-0">
-            <Image src={images.hero} alt="Products hero" fill priority sizes="100vw" className="object-cover" />
+            <Image 
+              src={images.hero} 
+              alt="Products hero" 
+              fill 
+              priority 
+              sizes="100vw" 
+              className="object-cover" 
+              loading="eager"
+            />
             <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(5,18,30,0.72)_0%,rgba(5,18,30,0.48)_38%,rgba(5,18,30,0.16)_100%)]" />
           </div>
           <div className="relative z-10 mx-auto flex h-full w-full max-w-screen-2xl items-center px-4 py-12 sm:px-6 md:px-8 lg:px-10 xl:px-12">
@@ -237,39 +245,6 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
           </div>
         </section>
 
-        <section id="catalog" className="bg-white px-4 py-12 md:py-24 sm:px-6 md:px-8 lg:px-10 lg:py-24 xl:px-12">
-          <div className="mx-auto max-w-screen-2xl text-center">
-            <h2 className="font-[family-name:var(--font-montserrat)] text-3xl font-semibold tracking-[-0.02em] text-[var(--brand-primary)] md:text-5xl">
-              {copy.categoriesTitle}
-            </h2>
-            <ProductCategoriesClient categories={categories} locale={lang} />
-          </div>
-        </section>
-
-        <section className="bg-[var(--brand-bg)] px-4 py-12 md:py-24 sm:px-6 md:px-8 lg:px-10 lg:py-24 xl:px-12">
-          <div className="mx-auto grid max-w-screen-2xl grid-cols-1 gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-14">
-            <div className="overflow-hidden rounded-[2rem] border border-[#d9dfce] bg-white shadow-[0_18px_48px_rgba(0,37,72,0.08)]">
-              <div className="relative aspect-[4/3]">
-                <Image src={images.flagship} alt={copy.flagshipTitle} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
-              </div>
-            </div>
-            <div>
-              <h2 className="font-[family-name:var(--font-montserrat)] text-3xl font-semibold leading-tight tracking-[-0.02em] text-[var(--brand-primary)] md:text-5xl">
-                {copy.flagshipTitle}
-              </h2>
-              <p className="mt-6 text-base leading-[1.7] text-slate-600 md:text-lg">{copy.flagshipBody}</p>
-              <ul className="mt-8 space-y-4">
-                {(copy.flagshipPoints || []).map((point: string) => (
-                  <li key={point} className="flex items-start gap-4 text-base leading-[1.7] text-slate-600">
-                    <span className="mt-2 h-2.5 w-2.5 shrink-0 rounded-full bg-[#95bb72]" />
-                    <span>{point}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </section>
-
         <section className="bg-white px-4 py-12 md:py-24 sm:px-6 md:px-8 lg:px-10 lg:py-24 xl:px-12">
           <div className="mx-auto max-w-screen-2xl">
             <div className="max-w-3xl">
@@ -290,6 +265,45 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                   </div>
                 </article>
               ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="catalog" className="bg-white px-4 py-12 md:py-24 sm:px-6 md:px-8 lg:px-10 lg:py-24 xl:px-12">
+          <div className="mx-auto max-w-screen-2xl text-center">
+            <h2 className="font-[family-name:var(--font-montserrat)] text-3xl font-semibold tracking-[-0.02em] text-[var(--brand-primary)] md:text-5xl">
+              {copy.categoriesTitle}
+            </h2>
+            <ProductCategoriesClient categories={categories} locale={lang} />
+          </div>
+        </section>
+
+        <section className="bg-[var(--brand-bg)] px-4 py-12 md:py-24 sm:px-6 md:px-8 lg:px-10 lg:py-24 xl:px-12">
+          <div className="mx-auto grid max-w-screen-2xl grid-cols-1 gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-14">
+            <div className="overflow-hidden rounded-[2rem] border border-[#d9dfce] bg-white shadow-[0_18px_48px_rgba(0,37,72,0.08)]">
+              <div className="relative aspect-[4/3]">
+                <Image 
+                  src={images.flagship} 
+                  alt={copy.flagshipTitle} 
+                  fill 
+                  sizes="(max-width: 1024px) 100vw, (max-width: 1536px) 52vw, 800px" 
+                  className="object-cover" 
+                />
+              </div>
+            </div>
+            <div>
+              <h2 className="font-[family-name:var(--font-montserrat)] text-3xl font-semibold leading-tight tracking-[-0.02em] text-[var(--brand-primary)] md:text-5xl">
+                {copy.flagshipTitle}
+              </h2>
+              <p className="mt-6 text-base leading-[1.7] text-slate-600 md:text-lg">{copy.flagshipBody}</p>
+              <ul className="mt-8 space-y-4">
+                {(copy.flagshipPoints || []).map((point: string) => (
+                  <li key={point} className="flex items-start gap-4 text-base leading-[1.7] text-slate-600">
+                    <span className="mt-2 h-2.5 w-2.5 shrink-0 rounded-full bg-[#95bb72]" />
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </section>

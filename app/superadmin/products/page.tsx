@@ -5,7 +5,9 @@ import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { AdminPortal } from "@/components/admin-portal";
 import { CmsAssetUploadButton } from "@/components/cms-asset-upload-button";
+import { CmsSaveToast, type CmsSaveStatus } from "@/components/cms-save-toast";
 import { ShoppingBasket } from "lucide-react";
+import { savePageContent, saveProduct, reorderProducts } from "@/lib/actions";
 
 type Locale = "th" | "en" | "zh";
 
@@ -145,11 +147,25 @@ export default function ProductManagement() {
   const [products, setProducts] = useState<Product[]>([]);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<"idle" | "confirming" | "saving" | "success" | "error">("idle");
-  const [productSaveStatus, setProductSaveStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
-  const [autoSaveStatus, setAutoSaveStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
+  const [saveStatus, setSaveStatus] = useState<CmsSaveStatus>("idle");
+  const [productSaveStatus, setProductSaveStatus] = useState<CmsSaveStatus>("idle");
+  const [autoSaveStatus, setAutoSaveStatus] = useState<CmsSaveStatus>("idle");
   const [draggedIndex, setDragIndex] = useState<number | null>(null);
   const [draggedBrandIndex, setDraggedBrandIndex] = useState<number | null>(null);
+  const [adminLang, setAdminLang] = useState<string>("th");
+
+  useEffect(() => {
+    const getLang = () => {
+      if (typeof window !== "undefined") {
+        return localStorage.getItem("admin_lang") || "th";
+      }
+      return "th";
+    };
+    setAdminLang(getLang());
+    const handleLangChange = () => setAdminLang(getLang());
+    window.addEventListener("admin_lang_changed", handleLangChange);
+    return () => window.removeEventListener("admin_lang_changed", handleLangChange);
+  }, []);
 
   useEffect(() => {
     async function fetchData() {
@@ -230,23 +246,11 @@ export default function ProductManagement() {
 
   const handleSavePage = async () => {
     setSaveStatus("saving");
-    try {
-      const { error } = await supabase.from("page_content").upsert(
-        {
-          page_name: "products_page",
-          content: pageContent,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "page_name" },
-      );
+    const result = await savePageContent("products_page", pageContent);
 
-      if (error) {
-        throw error;
-      }
-
+    if (result.success) {
       setSaveStatus("success");
-    } catch (error) {
-      console.error("Error saving products page content:", error);
+    } else {
       setSaveStatus("error");
     }
   };
@@ -277,31 +281,23 @@ export default function ProductManagement() {
     }
 
     setProductSaveStatus("saving");
-    try {
-      const { error } = await supabase
-        .from("products")
-        .update({
-          is_in_season: editingProduct.is_in_season,
-          th: editingProduct.th,
-          en: editingProduct.en,
-          zh: editingProduct.zh,
-          image_url: editingProduct.image_url,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", editingProduct.id);
+    const result = await saveProduct({
+      id: editingProduct.id,
+      is_in_season: editingProduct.is_in_season,
+      th: editingProduct.th,
+      en: editingProduct.en,
+      zh: editingProduct.zh,
+      image_url: editingProduct.image_url,
+    });
 
-      if (error) {
-        throw error;
-      }
-
+    if (result.success) {
       setProducts((prev) => prev.map((product) => (product.id === editingProduct.id ? editingProduct : product)));
       setProductSaveStatus("success");
       setTimeout(() => {
         setIsModalOpen(false);
         setProductSaveStatus("idle");
       }, 1000);
-    } catch (error) {
-      console.error("Error saving product:", error);
+    } else {
       setProductSaveStatus("error");
     }
   };
@@ -328,16 +324,18 @@ export default function ProductManagement() {
   const onDragEnd = async () => {
     setDragIndex(null);
     setAutoSaveStatus("saving");
-    try {
-      await Promise.all(
-        products.map((product, index) =>
-          supabase.from("products").update({ sort_order: index }).eq("id", product.id),
-        ),
-      );
+    
+    const productOrders = products.map((product, index) => ({
+      id: product.id,
+      sort_order: index,
+    }));
+
+    const result = await reorderProducts(productOrders);
+
+    if (result.success) {
       setAutoSaveStatus("success");
       setTimeout(() => setAutoSaveStatus("idle"), 1500);
-    } catch (error) {
-      console.error("Error auto-saving product order:", error);
+    } else {
       setAutoSaveStatus("error");
     }
   };
@@ -403,47 +401,31 @@ export default function ProductManagement() {
       </section>
 
       <button
-        onClick={() => setSaveStatus("confirming")}
+        onClick={handleSavePage}
         className="fixed bottom-4 right-4 md:bottom-6 md:right-6 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center shadow-2xl z-50 transition-all hover:-translate-y-2 active:scale-90 bg-[#002548] text-white hover:bg-slate-800"
         title="Save"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
       </button>
+      <CmsSaveToast
+        status={saveStatus}
+        onClear={() => setSaveStatus("idle")}
+        messages={{
+          saving: { th: "กำลังบันทึกข้อมูลหน้าสินค้า...", en: "Saving Products page changes...", zh: "正在保存产品页内容..." }[adminLang as "th" | "en" | "zh"] || "Saving...",
+          success: { th: "บันทึกข้อมูลหน้าสินค้าเรียบร้อยแล้ว", en: "Products page saved successfully.", zh: "产品页内容保存成功。" }[adminLang as "th" | "en" | "zh"] || "Saved.",
+          error: { th: "ไม่สามารถบันทึกข้อมูลหน้าสินค้าได้", en: "Unable to save the Products page.", zh: "无法保存产品页内容。" }[adminLang as "th" | "en" | "zh"] || "Error.",
+        }}
+      />
 
-      <AdminPortal>
-        <div className={`fixed inset-0 z-[9999] flex items-center justify-center p-4 transition-all duration-500 ${saveStatus !== "idle" ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}>
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-xl" onClick={() => saveStatus !== "saving" && setSaveStatus("idle")}></div>
-          <div className="relative w-full max-w-sm bg-white rounded-[2.5rem] p-10 shadow-2xl text-center">
-            {saveStatus === "confirming" && (
-              <div className="space-y-8 py-2">
-                <div>
-                  <h3 className="text-xl font-bold text-slate-800">ยืนยันการบันทึก?</h3>
-                  <p className="text-slate-500 mt-2 text-sm font-medium leading-relaxed px-4">บันทึกข้อมูลหน้า Products ลงฐานข้อมูล</p>
-                </div>
-                <div className="flex gap-3">
-                  <button onClick={() => setSaveStatus("idle")} className="flex-1 py-3 rounded-2xl font-bold text-slate-400 hover:bg-slate-50 transition-colors text-sm uppercase tracking-widest">ยกเลิก</button>
-                  <button onClick={handleSavePage} className="flex-1 py-3 bg-[#002548] text-white rounded-2xl font-bold shadow-lg hover:bg-slate-800 transition-all text-sm uppercase tracking-widest">บันทึก</button>
-                </div>
-              </div>
-            )}
-            {saveStatus === "saving" && (
-              <div className="space-y-6 py-6">
-                <div className="w-16 h-16 border-4 border-[#002548]/10 border-t-[#002548] rounded-full animate-spin mx-auto"></div>
-                <p className="text-[#002548] font-bold animate-pulse uppercase tracking-widest text-sm">Saving...</p>
-              </div>
-            )}
-            {saveStatus === "success" && (
-              <div className="space-y-8 py-2">
-                <div>
-                  <h3 className="text-xl font-bold text-slate-800">บันทึกเรียบร้อย</h3>
-                  <p className="text-slate-500 mt-2 text-sm font-medium leading-relaxed px-4">หน้า Products จะใช้ข้อมูลชุดนี้ทันทีเมื่อโหลดใหม่</p>
-                </div>
-                <button onClick={() => setSaveStatus("idle")} className="w-full py-3 bg-[#002548] text-white rounded-2xl font-bold shadow-lg hover:bg-slate-800 transition-all text-sm uppercase tracking-widest">ตกลง</button>
-              </div>
-            )}
-          </div>
-        </div>
-      </AdminPortal>
+      <CmsSaveToast
+        status={autoSaveStatus}
+        onClear={() => setAutoSaveStatus("idle")}
+        messages={{
+          saving: { th: "กำลังอัปเดตลำดับสินค้า...", en: "Updating product order...", zh: "正在更新产品排序..." }[adminLang as "th" | "en" | "zh"] || "Updating...",
+          success: { th: "อัปเดตลำดับสินค้าเรียบร้อยแล้ว", en: "Product order synchronized.", zh: "产品排序已同步。" }[adminLang as "th" | "en" | "zh"] || "Synchronized.",
+          error: { th: "ไม่สามารถอัปเดตลำดับสินค้าได้", en: "Failed to update product order.", zh: "产品排序更新失败。" }[adminLang as "th" | "en" | "zh"] || "Error.",
+        }}
+      />
 
       <LanguageTabs activeLang={activeLang} onChange={setActiveLang} />
 
@@ -744,3 +726,4 @@ export default function ProductManagement() {
     </div>
   );
 }
+

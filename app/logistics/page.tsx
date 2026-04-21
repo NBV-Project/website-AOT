@@ -242,12 +242,12 @@ const copyByLocale: Record<Locale, LogisticsCopy> = {
   zh: {
     heroTitle: ["精准物流体系", "服务出口货品"],
     heroBody:
-      "เราบริหารการขนส่งผลไม้และสินค้าเกษตรด้วยระบบที่เน้นความปลอดภัย ความรวดเร็ว และความตรงเวลา เพื่อให้สินค้าไปถึงตลาดจีนในสภาพพร้อมจำหน่าย",
+      "我们以重视安全、速度与准时性的物流体系管理水果与农产品运输，确保货品抵达中国市场时保持适合销售的状态。",
     primaryCta: "获取咨询",
     secondaryCta: "咨询服务",
     supportTitle: "连接产地与终端市场的运输体系",
     supportBody:
-      "除了选品，เรายังดูแลเรื่องการจัดเตรียมลอต การแพ็ก การขนถ่าย การควบคุมสภาพสินค้า และการเชื่อมต่อเข้าสู่ตลาดค้าส่งปลายทาง เพื่อให้ทุกลอตเดินทางได้ต่อเนื่อง",
+      "除了选品之外，我们也负责批次准备、包装、装卸、货况控制以及与终端批发市场的衔接，确保每一批货都能稳定连续地运输。",
     supportPoints: [
       "根据不同水果品类匹配合适的运输条件",
       "围绕中国重点市场规划出口路线",
@@ -319,6 +319,18 @@ const copyByLocale: Record<Locale, LogisticsCopy> = {
   },
 };
 
+const heroPrimaryCtaByLocale: Record<Locale, string> = {
+  th: "ขอคำปรึกษา",
+  en: "Get Consultation",
+  zh: "获取咨询",
+};
+
+const heroSecondaryCtaByLocale: Record<Locale, string> = {
+  th: "ดูเส้นทางขนส่ง",
+  en: "View Delivery Network",
+  zh: "查看运输网络",
+};
+
 type LogisticsProps = {
   searchParams: Promise<{ lang?: string }>;
 };
@@ -363,6 +375,8 @@ export default async function LogisticsPage({ searchParams }: LogisticsProps) {
     route: dbContent.images?.route || logisticsImages.route,
     packaging: dbContent.images?.packaging || logisticsImages.packaging,
   };
+  const heroPrimaryCta = heroPrimaryCtaByLocale[lang];
+  const heroSecondaryCta = heroSecondaryCtaByLocale[lang];
   const destinationHeading = copy.destinationHeading;
   const mapDestinations = copy.destinations.map((dest: { city: string; market: string }, i: number) => ({
     city: dest.city,
@@ -376,11 +390,10 @@ export default async function LogisticsPage({ searchParams }: LogisticsProps) {
         <SiteHeader activeHref="/logistics" brand={brand} currentLocale={lang} navigation={navigation} />
 
         <section className="relative h-screen min-h-[600px] overflow-hidden bg-[var(--brand-primary)]">
-          <div className="absolute inset-0">
+            <div className="absolute inset-0">
               <HeroBackgroundVideo
               className="h-full w-full scale-[1.22] translate-y-[-2%] object-cover object-center"
               src={images.heroVideo}
-              poster={images.heroPoster}
             />
             <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.64)_0%,rgba(0,0,0,0.32)_38%,rgba(0,0,0,0.08)_100%)]" />
           </div>
@@ -399,16 +412,16 @@ export default async function LogisticsPage({ searchParams }: LogisticsProps) {
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row reveal-delayed-2">
                 <Link
-                  href={withLang("/contact", lang)}
+                  href={`${withLang("/contact", lang)}#contact-form`}
                   className="inline-flex min-w-[9.5rem] items-center justify-center rounded-md border-2 border-white bg-white px-7 py-4 text-center font-[family-name:var(--font-montserrat)] text-base font-medium text-[var(--brand-primary)] transition duration-300 hover:-translate-y-0.5 hover:bg-transparent hover:text-white hover:shadow-md"
                 >
-                  {copy.primaryCta}
+                  {heroPrimaryCta}
                 </Link>
                 <Link
-                  href={withLang("/contact", lang)}
+                  href="#delivery-network"
                   className="inline-flex min-w-[9.5rem] items-center justify-center rounded-md border-2 border-white bg-transparent px-7 py-4 text-center font-[family-name:var(--font-montserrat)] text-base font-medium text-white transition duration-300 hover:-translate-y-0.5 hover:bg-white hover:text-[var(--brand-primary)] hover:shadow-md"
                 >
-                  {copy.secondaryCta}
+                  {heroSecondaryCta}
                 </Link>
               </div>
             </div>
@@ -448,7 +461,7 @@ export default async function LogisticsPage({ searchParams }: LogisticsProps) {
           </div>
         </section>
 
-        <section className="bg-white px-4 py-12 md:py-24 sm:px-6 md:px-8 lg:px-10 lg:py-28 xl:px-12">
+        <section id="delivery-network" className="bg-white px-4 py-12 md:py-24 sm:px-6 md:px-8 lg:px-10 lg:py-28 xl:px-12">
           <div className="mx-auto grid max-w-screen-2xl grid-cols-1 gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16">
             <LogisticsChinaMap
               destinations={mapDestinations}

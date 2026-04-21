@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
+import Script from "next/script";
 import { unstable_cache } from "next/cache";
 import { supabase } from "@/lib/supabase";
 
@@ -10,7 +10,6 @@ import {
   type Locale,
   navigationByLocale,
   resolveLocale,
-  withLang,
 } from "@/lib/locale";
 
 const aboutHeroImage = "/images/pc.png";
@@ -57,6 +56,39 @@ type StrengthSection = {
   body: string;
   cards: StrengthCard[];
 };
+
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((item) => typeof item === "string");
+}
+
+function isStrengthCardArray(value: unknown): value is StrengthCard[] {
+  return Array.isArray(value) && value.every((item) => {
+    if (!item || typeof item !== "object") {
+      return false;
+    }
+
+    const card = item as Record<string, unknown>;
+
+    return typeof card.title === "string" && typeof card.body === "string";
+  });
+}
+
+function isLeaderArray(value: unknown): value is Leader[] {
+  return Array.isArray(value) && value.every((item) => {
+    if (!item || typeof item !== "object") {
+      return false;
+    }
+
+    const leader = item as Record<string, unknown>;
+
+    return (
+      typeof leader.name === "string" &&
+      typeof leader.role === "string" &&
+      typeof leader.quote === "string" &&
+      typeof leader.image === "string"
+    );
+  });
+}
 
 const leadersByLocale: Record<Locale, Leader[]> = {
   th: [
@@ -168,23 +200,34 @@ export default async function AboutPage({ searchParams }: AboutProps) {
   const lang = resolveLocale(resolvedSearchParams.lang);
   const pageData = await getAboutData();
 
-  const dbContent = pageData?.content || {};
-  const dbLangContent = dbContent[lang] || {};
+  const dbContent = (pageData?.content as Record<string, unknown>) || {};
+  const dbLangContent = (dbContent[lang] as Record<string, unknown>) || {};
   const defaultCopy = aboutCopy[lang];
 
-  // 2. Merge Data
+  // 2. Merge Data with deep fallback
   const copy = {
     ...defaultCopy,
     ...dbLangContent,
-    heroTitle: dbLangContent.heroTitle || defaultCopy.heroTitle,
+    heroTitle: (dbLangContent.heroTitle && Array.isArray(dbLangContent.heroTitle) && dbLangContent.heroTitle.length > 0) ? dbLangContent.heroTitle as string[] : defaultCopy.heroTitle,
+    heroBody: (dbLangContent.heroBody as string) || defaultCopy.heroBody,
+    storyTitle: (dbLangContent.storyTitle as string) || defaultCopy.storyTitle,
+    storyBody: (dbLangContent.storyBody as string) || defaultCopy.storyBody,
+    missionTitle: (dbLangContent.missionTitle as string) || defaultCopy.missionTitle,
+    missionBody: (dbLangContent.missionBody as string) || defaultCopy.missionBody,
+    sustainabilityTitle: (dbLangContent.sustainabilityTitle as string) || defaultCopy.sustainabilityTitle,
+    sustainabilityBody: (dbLangContent.sustainabilityBody as string) || defaultCopy.sustainabilityBody,
+    leadersTitle: (dbLangContent.leadersTitle as string) || defaultCopy.leadersTitle,
+    leadersBody: (dbLangContent.leadersBody as string) || defaultCopy.leadersBody,
   };
 
   const navigation = navigationByLocale[lang];
-  const leaders = dbLangContent.leaders || leadersByLocale[lang];
+  const leaders = isLeaderArray(dbLangContent.leaders)
+    ? dbLangContent.leaders
+    : leadersByLocale[lang];
   const brand = brandByLocale[lang];
   const images = {
-    hero: dbContent.images?.hero || aboutHeroImage,
-    story: dbContent.images?.story || storyImage,
+    hero: (dbContent.images as Record<string, string>)?.hero || aboutHeroImage,
+    story: (dbContent.images as Record<string, string>)?.story || storyImage,
   };
   
   const movedStrengthSection: StrengthSection = {
@@ -213,7 +256,7 @@ export default async function AboutPage({ searchParams }: AboutProps) {
     zh: {
       kicker: "核心优势",
       title: ["简洁而精准的出口结构", "持续稳定运营"],
-      body: "我们将每个步骤规划为从产地到目的地的无缝衔接，确保产品以稳定的品质、新鲜度和信心到达市场。",
+      body: "我们将每个步骤规划为จาก产地到目的地的无缝衔接，确保产品以稳定的品质、新鲜度和信心到达市场。",
       cards: [
         { title: "精选采购", body: "严格甄选适合出口市场的果园与产地水果。" },
         { title: "精准运输", body: "根据每个产品类别规划路线、时机和发运方式。" },
@@ -223,25 +266,43 @@ export default async function AboutPage({ searchParams }: AboutProps) {
     },
   }[lang];
 
-  const strengthSection = {
-    kicker: dbLangContent.strengthKicker || movedStrengthSection.kicker,
-    title: dbLangContent.strengthTitle || movedStrengthSection.title,
-    body: dbLangContent.strengthBody || movedStrengthSection.body,
-    cards: dbLangContent.strengthCards || movedStrengthSection.cards,
+  const strengthSection: StrengthSection = {
+    kicker:
+      typeof dbLangContent.strengthKicker === "string"
+        ? dbLangContent.strengthKicker
+        : movedStrengthSection.kicker,
+    title: isStringArray(dbLangContent.strengthTitle)
+      ? dbLangContent.strengthTitle
+      : movedStrengthSection.title,
+    body:
+      typeof dbLangContent.strengthBody === "string"
+        ? dbLangContent.strengthBody
+        : movedStrengthSection.body,
+    cards: isStrengthCardArray(dbLangContent.strengthCards)
+      ? dbLangContent.strengthCards
+      : movedStrengthSection.cards,
   };
 
   return (
     <main className="bg-[var(--brand-bg)] font-[family-name:var(--font-open-sans)] text-[var(--brand-text)] transition-colors duration-500">
       <SiteHeader activeHref="/about" brand={brand} currentLocale={lang} navigation={navigation} />
 
-      <section className="relative h-screen min-h-[600px] overflow-hidden bg-[var(--brand-primary)]">
+      <section className="relative h-dvh min-h-[600px] overflow-hidden bg-[var(--brand-primary)]">
         <div className="absolute inset-0">
-          <Image src={images.hero} alt={copy.heroTitle.join(" ")} fill priority sizes="100vw" className="object-cover" />
+          <Image 
+            src={images.hero} 
+            alt={copy.heroTitle.join(" ")} 
+            fill 
+            priority 
+            sizes="100vw" 
+            className="object-cover" 
+            quality={90}
+          />
           <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.64)_0%,rgba(0,0,0,0.32)_38%,rgba(0,0,0,0.08)_100%)]" />
         </div>
 
         <div className="relative z-10 mx-auto flex h-full w-full max-w-screen-2xl items-center px-4 py-12 sm:px-6 md:px-8 lg:px-10 xl:px-12">
-          <div className="max-w-4xl reveal mt-20">
+          <div className="mt-20 max-w-4xl reveal">
             <h1 className="font-[family-name:var(--font-montserrat)] text-4xl font-bold leading-[1.1] tracking-[-0.018em] text-white md:text-7xl">
               {(copy.heroTitle || []).map((line: string) => (
                 <span key={line} className="block md:whitespace-nowrap">{line}</span>
@@ -252,16 +313,23 @@ export default async function AboutPage({ searchParams }: AboutProps) {
         </div>
       </section>
 
-      <section className="bg-white px-4 py-12 md:py-24 sm:px-6 md:px-8 lg:px-10 lg:py-28 xl:px-12">
+      <section className="bg-white px-4 py-12 md:py-24 sm:px-6 md:px-8 lg:px-10 lg:py-28 xl:px-12 reveal-on-scroll">
         <div className="mx-auto grid max-w-screen-2xl grid-cols-1 gap-12 md:grid-cols-12 md:items-center md:gap-16">
-          <div className="group relative md:col-span-5">
-            <div className="aspect-[4/5] overflow-hidden bg-[#e8ecdf] shadow-[24px_24px_60px_rgba(0,37,72,0.08)] transition-all duration-500 group-hover:-translate-y-1 group-hover:shadow-[28px_28px_70px_rgba(0,37,72,0.14)]">
-              <Image src={images.story} alt="Durian inspection at origin" fill sizes="(max-width: 768px) 100vw, 42vw" className="object-cover transition duration-700 group-hover:scale-105" />
+          <div className="group relative md:col-span-5 reveal-delayed-1">
+            <div className="relative aspect-[4/5] overflow-hidden bg-[#e8ecdf] shadow-[24px_24px_60px_rgba(0,37,72,0.08)] transition-all duration-500 group-hover:-translate-y-1 group-hover:shadow-[28px_28px_70px_rgba(0,37,72,0.14)]">
+              <Image 
+                src={images.story} 
+                alt="Fruit inspection and quality control" 
+                fill 
+                sizes="(max-width: 768px) 100vw, (max-width: 1280px) 40vw, 550px" 
+                className="object-cover transition duration-700 group-hover:scale-105" 
+                quality={85}
+              />
             </div>
             <div className="absolute -bottom-8 -right-8 h-40 w-40 rounded-full bg-[#95bb72]/15 blur-3xl" />
           </div>
 
-          <div className="space-y-8 md:col-span-7 reveal">
+          <div className="space-y-8 md:col-span-7 reveal-delayed-2">
             <div className="inline-flex bg-[var(--brand-bg)] px-4 py-1 text-[0.68rem] font-bold uppercase tracking-[0.26em] text-[#6f9152]">{copy.storyLabel}</div>
             <h2 className="font-[family-name:var(--font-montserrat)] text-3xl font-semibold leading-[1.02] tracking-[-0.02em] text-[var(--brand-primary)] md:text-5xl lg:text-6xl">{copy.storyTitle}</h2>
             <p className="max-w-3xl text-base leading-[1.7] text-slate-600 md:text-lg">{copy.storyBody}</p>
@@ -269,16 +337,13 @@ export default async function AboutPage({ searchParams }: AboutProps) {
         </div>
       </section>
 
-      <section className="bg-[var(--brand-bg)] px-4 pb-20 pt-12 sm:px-6 sm:pt-14 md:px-8 lg:px-10 lg:pb-28 lg:pt-16 xl:px-12">
+      <section className="bg-[var(--brand-bg)] px-4 pb-20 pt-12 sm:px-6 sm:pt-14 md:px-8 lg:px-10 lg:pb-28 lg:pt-16 xl:px-12 reveal-on-scroll">
         <div className="mx-auto grid max-w-screen-2xl grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
-          <div className="bg-white p-8 shadow-sm sm:p-10 lg:col-span-7 lg:p-14">
+          <div className="bg-white p-8 shadow-sm sm:p-10 lg:col-span-7 lg:p-14 reveal-delayed-1">
             <h2 className="font-[family-name:var(--font-montserrat)] text-3xl font-semibold text-[var(--brand-primary)] md:text-5xl">{copy.missionTitle}</h2>
             <p className="mt-6 text-base leading-[1.7] text-slate-600 md:text-lg">{copy.missionBody}</p>
-            <Link href={withLang("/products", lang)} className="mt-8 inline-flex items-center gap-3 border-b-2 border-[#002548]/15 pb-1 font-[family-name:var(--font-montserrat)] text-base font-medium tracking-[0.12em] text-[var(--brand-primary)] transition hover:border-[#002548]">
-              {copy.missionCta} <span aria-hidden="true">↗</span>
-            </Link>
           </div>
-          <div className="relative overflow-hidden bg-[var(--brand-bg)] p-8 sm:p-10 lg:col-span-5 lg:p-14">
+          <div className="relative overflow-hidden bg-[var(--brand-bg)] p-8 sm:p-10 lg:col-span-5 lg:p-14 reveal-delayed-2">
             <div className="relative z-10">
               <h2 className="font-[family-name:var(--font-montserrat)] text-3xl font-semibold text-[var(--brand-primary)] md:text-5xl">{copy.sustainabilityTitle}</h2>
               <p className="mt-6 text-base leading-[1.7] text-slate-600 md:text-lg">{copy.sustainabilityBody}</p>
@@ -288,9 +353,9 @@ export default async function AboutPage({ searchParams }: AboutProps) {
         </div>
       </section>
 
-      <section className="bg-[var(--brand-primary)] px-4 py-24 text-white transition-colors duration-500">
+      <section className="bg-[var(--brand-primary)] px-4 py-24 text-white transition-colors duration-500 reveal-on-scroll">
         <div className="mx-auto max-w-screen-2xl">
-          <div className="max-w-3xl">
+          <div className="max-w-3xl reveal-delayed-1">
             <span className="text-sm text-[#d8e3c4]">{strengthSection.kicker}</span>
             <h2 className="mt-3 font-[family-name:var(--font-montserrat)] text-3xl font-semibold leading-[1.02] tracking-[-0.02em] md:text-5xl">
               {(strengthSection.title || []).map((line: string) => (
@@ -300,9 +365,9 @@ export default async function AboutPage({ searchParams }: AboutProps) {
             <p className="mt-5 text-base leading-[1.7] text-white/78 md:text-lg">{strengthSection.body}</p>
           </div>
 
-          <div className="mt-12 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-12 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4 reveal-delayed-2">
             {(strengthSection.cards || []).map((item: StrengthCard, index: number) => (
-              <article key={index} className="rounded-[1.75rem] border border-white/10 bg-white/8 p-6 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:bg-white/12">
+              <article key={index} className="rounded-[1.75rem] border border-white/10 bg-white/8 p-6 transition duration-300 hover:-translate-y-1 hover:bg-white/12">
                 <div className="mb-5 h-2 w-14 rounded-full bg-[#d8c196]" />
                 <h3 className="font-[family-name:var(--font-montserrat)] text-xl font-semibold">{item.title}</h3>
                 <p className="mt-3 text-base leading-[1.7] text-white/75">{item.body}</p>
@@ -312,18 +377,25 @@ export default async function AboutPage({ searchParams }: AboutProps) {
         </div>
       </section>
 
-      <section className="bg-white px-4 py-24 xl:px-12">
+      <section className="bg-white px-4 py-24 xl:px-12 reveal-on-scroll">
         <div className="mx-auto max-w-screen-2xl">
-          <div className="mb-14">
+          <div className="mb-14 reveal-delayed-1">
             <h2 className="font-[family-name:var(--font-montserrat)] text-3xl font-semibold tracking-[-0.02em] text-[var(--brand-primary)] md:text-5xl">{copy.leadersTitle}</h2>
             <p className="mt-4 max-w-2xl text-base leading-[1.7] text-slate-500 md:text-lg">{copy.leadersBody}</p>
           </div>
 
-          <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-10 md:grid-cols-3 reveal-delayed-2">
             {leaders.map((leader: Leader) => (
               <article key={leader.name} className="group">
                 <div className="relative mb-6 aspect-[3/4] overflow-hidden bg-[var(--brand-bg)] rounded-2xl shadow-lg">
-                  <Image src={leader.image} alt={leader.name} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover transition duration-700 group-hover:scale-105" />
+                  <Image
+                    src={leader.image}
+                    alt={leader.name}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
+                    loading={leader.image === "/images/team-sourcing-new.jpg" ? "eager" : "lazy"}
+                    className="object-cover transition duration-700 group-hover:scale-105"
+                  />
                 </div>
                 <h3 className="font-[family-name:var(--font-montserrat)] text-2xl font-bold text-[var(--brand-primary)]">{leader.name}</h3>
                 <p className="mt-1 text-xs uppercase tracking-[0.22em] text-slate-500">{leader.role}</p>
@@ -335,6 +407,33 @@ export default async function AboutPage({ searchParams }: AboutProps) {
       </section>
 
       <SiteFooter locale={lang} />
+      <AnimationScript />
     </main>
+  );
+}
+
+function AnimationScript() {
+  return (
+    <Script
+      id="reveal-on-scroll-script"
+      strategy="afterInteractive"
+      dangerouslySetInnerHTML={{
+        __html: `
+          (function() {
+            const observer = new IntersectionObserver((entries) => {
+              entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                  entry.target.classList.add('active-reveal');
+                }
+              });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.reveal-on-scroll').forEach(el => {
+              observer.observe(el);
+            });
+          })();
+        `,
+      }}
+    />
   );
 }

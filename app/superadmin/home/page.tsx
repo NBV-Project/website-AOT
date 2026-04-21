@@ -3,10 +3,12 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { XCircle, Lightbulb } from "lucide-react";
+import { Lightbulb } from "lucide-react";
 import { AdminPortal } from "@/components/admin-portal";
 import { CmsAssetUploadButton } from "@/components/cms-asset-upload-button";
+import { CmsSaveToast, type CmsSaveStatus } from "@/components/cms-save-toast";
 import { supabase } from "@/lib/supabase";
+import { savePageContent } from "@/lib/actions";
 
 interface HomeLanguageContent {
   heroTitle: string[];
@@ -198,9 +200,23 @@ export default function HomeEditor() {
   const [activeLang, setActiveLang] = useState<"th" | "en" | "zh">("th");
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [activeDetailIndex, setActiveDetailIndex] = useState<number>(0);
-  const [saveStatus, setSaveStatus] = useState<"idle" | "confirming" | "saving" | "success" | "error">("idle");
+  const [saveStatus, setSaveStatus] = useState<CmsSaveStatus>("idle");
   const [isLoading, setIsLoading] = useState(true);
   const [content, setContent] = useState<HomeContent>(defaultContent);
+  const [adminLang, setAdminLang] = useState<string>("th");
+
+  useEffect(() => {
+    const getLang = () => {
+      if (typeof window !== "undefined") {
+        return localStorage.getItem("admin_lang") || "th";
+      }
+      return "th";
+    };
+    setAdminLang(getLang());
+    const handleLangChange = () => setAdminLang(getLang());
+    window.addEventListener("admin_lang_changed", handleLangChange);
+    return () => window.removeEventListener("admin_lang_changed", handleLangChange);
+  }, []);
 
   useEffect(() => {
     async function fetchData() {
@@ -235,20 +251,11 @@ export default function HomeEditor() {
   const handleSave = async () => {
     setSaveStatus("saving");
 
-    try {
-      const { error } = await supabase.from("page_content").upsert(
-        {
-          page_name: "home",
-          content,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "page_name" },
-      );
+    const result = await savePageContent("home", content);
 
-      if (error) throw error;
+    if (result.success) {
       setSaveStatus("success");
-    } catch (err) {
-      console.error("Error saving:", err);
+    } else {
       setSaveStatus("error");
     }
   };
@@ -337,7 +344,7 @@ export default function HomeEditor() {
       </section>
 
       <button
-        onClick={() => setSaveStatus("confirming")}
+        onClick={handleSave}
         className="fixed bottom-4 right-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-[#002548] text-white shadow-2xl transition-all hover:-translate-y-2 hover:bg-slate-800 active:scale-90 md:bottom-6 md:right-6 md:h-12 md:w-12"
         title="บันทึกการเปลี่ยนแปลง"
       >
@@ -357,96 +364,15 @@ export default function HomeEditor() {
           <polyline points="7 3 7 8 15 8" />
         </svg>
       </button>
-
-      <AdminPortal>
-        <div
-          className={`fixed inset-0 z-[9999] flex items-center justify-center p-4 transition-all duration-500 ${
-            saveStatus !== "idle" ? "visible opacity-100" : "invisible pointer-events-none opacity-0"
-          }`}
-        >
-          <div
-            className="absolute inset-0 bg-slate-900/60 backdrop-blur-xl"
-            onClick={() => saveStatus !== "saving" && setSaveStatus("idle")}
-          />
-          <div
-            className={`relative w-full max-w-sm rounded-[2.5rem] bg-white p-10 text-center shadow-2xl transition-all duration-500 ${
-              saveStatus !== "idle" ? "translate-y-0 scale-100" : "translate-y-4 scale-95"
-            }`}
-            style={{ transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
-          >
-            {saveStatus === "confirming" && (
-              <div className="space-y-8 py-2">
-                <div>
-                  <h3 className="text-xl font-bold text-slate-800">ยืนยันการบันทึก?</h3>
-                  <p className="mt-2 px-4 text-sm font-medium leading-relaxed text-slate-500">
-                    คุณต้องการบันทึกการเปลี่ยนแปลงเนื้อหาทั้งหมดลงในฐานข้อมูลใช่หรือไม่
-                  </p>
-                </div>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setSaveStatus("idle")}
-                    className="flex-1 rounded-2xl py-3 text-sm font-bold uppercase tracking-widest text-slate-400 transition-colors hover:bg-slate-50"
-                  >
-                    ยกเลิก
-                  </button>
-                  <button
-                    onClick={handleSave}
-                    className="flex-1 rounded-2xl bg-[#002548] py-3 text-sm font-bold uppercase tracking-widest text-white shadow-lg transition-all hover:bg-slate-800"
-                  >
-                    บันทึกเลย
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {saveStatus === "saving" && (
-              <div className="space-y-6 py-6">
-                <div className="mx-auto h-16 w-16 animate-spin rounded-full border-4 border-[#002548]/10 border-t-[#002548]" />
-                <p className="animate-pulse text-sm font-bold uppercase tracking-widest text-[#002548]">
-                  กำลังบันทึกข้อมูล...
-                </p>
-              </div>
-            )}
-
-            {saveStatus === "success" && (
-              <div className="space-y-8 py-2">
-                <div>
-                  <h3 className="text-xl font-bold text-slate-800">บันทึกเรียบร้อย!</h3>
-                  <p className="mt-2 px-4 text-sm font-medium leading-relaxed text-slate-500">
-                    ข้อมูลถูกอัปเดตลงฐานข้อมูล Supabase สำเร็จแล้ว
-                  </p>
-                </div>
-                <button
-                  onClick={() => setSaveStatus("idle")}
-                  className="w-full rounded-2xl bg-[#002548] py-3 text-sm font-bold uppercase tracking-widest text-white shadow-lg transition-all hover:bg-slate-800"
-                >
-                  ตกลง
-                </button>
-              </div>
-            )}
-
-            {saveStatus === "error" && (
-              <div className="space-y-6">
-                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-red-50 text-red-500">
-                  <XCircle className="h-9 w-9" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-slate-800">เกิดข้อผิดพลาด</h3>
-                  <p className="mt-2 px-4 text-sm font-medium leading-relaxed text-slate-500">
-                    ไม่สามารถเชื่อมต่อกับฐานข้อมูลได้ในขณะนี้ กรุณาลองใหม่อีกครั้ง
-                  </p>
-                </div>
-                <button
-                  onClick={() => setSaveStatus("confirming")}
-                  className="w-full rounded-2xl bg-red-500 py-3 text-sm font-bold uppercase tracking-widest text-white shadow-lg transition-all hover:bg-red-600"
-                >
-                  ลองใหม่
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </AdminPortal>
+      <CmsSaveToast
+        status={saveStatus}
+        onClear={() => setSaveStatus("idle")}
+        messages={{
+          saving: { th: "กำลังบันทึกข้อมูลหน้าแรก...", en: "Saving Home page changes...", zh: "正在保存首页内容..." }[adminLang as "th" | "en" | "zh"] || "Saving...",
+          success: { th: "บันทึกข้อมูลหน้าแรกเรียบร้อยแล้ว", en: "Home page saved successfully.", zh: "首页内容保存成功。" }[adminLang as "th" | "en" | "zh"] || "Saved.",
+          error: { th: "ไม่สามารถบันทึกข้อมูลหน้าแรกได้", en: "Unable to save the Home page.", zh: "无法保存首页内容。" }[adminLang as "th" | "en" | "zh"] || "Error.",
+        }}
+      />
 
       <div className="-mx-4 overflow-x-auto px-4 pb-4 sm:mx-0 sm:px-0 hide-scrollbar">
         <div className="flex w-fit whitespace-nowrap rounded-[2rem] border border-slate-100 bg-white p-2 text-[16px] shadow-sm ring-4 ring-slate-50">
@@ -553,6 +479,7 @@ export default function HomeEditor() {
                 className="rounded-[2rem] shadow-lg ring-4 ring-slate-50 sm:rounded-[2.5rem] sm:ring-8"
                 onUploaded={(url) => updateImage("hero", url)}
                 pathPrefix="home"
+                sizes="(max-width: 1024px) 100vw, 50vw"
               />
               <p className="text-center text-[9px] font-medium italic text-slate-400 opacity-60 underline underline-offset-4 sm:text-[10px]">
                 แนะนำขนาด: 1920 x 1080 px
@@ -612,6 +539,7 @@ export default function HomeEditor() {
                 className="rounded-[2rem] shadow-lg ring-4 ring-slate-50 sm:rounded-[2.5rem] sm:ring-8"
                 onUploaded={(url) => updateImage("overview", url)}
                 pathPrefix="home"
+                sizes="(max-width: 1024px) 100vw, 50vw"
               />
               <p className="text-center text-[9px] font-medium italic text-slate-400 opacity-60 underline underline-offset-4 sm:text-[10px]">
                 แนะนำขนาด: 1200 x 900 px
@@ -689,6 +617,7 @@ export default function HomeEditor() {
                       src={detail.image || "/images/home-story-origin.jpg"} 
                       alt={detail.title}
                       fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1280px) 33vw, 400px"
                       className="object-cover transition-transform duration-1000 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#002548]/80 via-[#002548]/20 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
@@ -855,7 +784,7 @@ export default function HomeEditor() {
                       onClick={() => setIsDetailModalOpen(false)}
                       className="rounded-2xl bg-[#002548] px-12 py-4 text-xs font-black uppercase tracking-[0.3em] text-white shadow-2xl transition-all hover:bg-slate-800 hover:shadow-slate-800/20 active:scale-95"
                     >
-                      Confirm Changes
+                      Save & Close
                     </button>
                   </div>
                 </div>
@@ -867,3 +796,4 @@ export default function HomeEditor() {
     </div>
   );
 }
+

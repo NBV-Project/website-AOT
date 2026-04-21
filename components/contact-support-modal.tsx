@@ -206,6 +206,7 @@ export function ContactSupportModal({ isOpen, onClose, supportId, locale }: Cont
             src={data.image}
             alt={data.title}
             fill
+            sizes="(max-width: 768px) 100vw, 672px"
             className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[var(--brand-bg)] via-transparent to-transparent" />
@@ -222,10 +223,7 @@ export function ContactSupportModal({ isOpen, onClose, supportId, locale }: Cont
         </div>
 
         <div className="p-8 md:p-10 pt-0 overflow-y-auto">
-          <div className="flex items-center gap-4 mb-6 -mt-8 relative z-10 text-[16px]">
-            <span className="flex h-16 w-16 items-center justify-center rounded-3xl bg-white shadow-xl text-4xl border border-slate-50">
-              {data.icon}
-            </span>
+          <div className="mb-6 text-[16px]">
             <div className="pt-8">
               <span className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-[#6f9152]">
                 {locale === "th" ? "รายละเอียดการช่วยเหลือ" : locale === "zh" ? "支持详情" : "Support Details"}
@@ -243,20 +241,11 @@ export function ContactSupportModal({ isOpen, onClose, supportId, locale }: Cont
           <div className="space-y-3 text-[16px]">
             {data.points.map((point, idx) => (
               <div key={idx} className="flex gap-4 p-4 rounded-2xl bg-white/50 border border-slate-100 shadow-sm transition-all hover:bg-white hover:shadow-md group">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-[10px] text-slate-500 font-bold group-hover:bg-[#95bb72] group-hover:text-white transition-colors duration-300">
-                  {idx + 1}
-                </span>
                 <p className="text-sm md:text-base text-slate-700 leading-normal">{point}</p>
               </div>
             ))}
           </div>
 
-          <button
-            onClick={onClose}
-            className="mt-10 w-full rounded-xl bg-[var(--brand-primary)] py-4 font-bold text-white shadow-lg transition duration-300 hover:-translate-y-1 hover:brightness-110 active:scale-[0.98]"
-          >
-            {locale === "th" ? "เข้าใจแล้ว" : locale === "zh" ? "我明白了" : "Got it"}
-          </button>
         </div>
       </div>
     </div>

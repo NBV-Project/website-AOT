@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { ProductCategoriesClient } from "@/components/product-categories-client";
+import { ProductCategoriesHome } from "@/components/product-categories-home";
 import { OverviewSection } from "@/components/overview-section";
 import {
   brandByLocale,
@@ -149,7 +149,16 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
         <section className="relative h-screen min-h-[600px] overflow-hidden bg-[var(--brand-primary)]">
           <div className="absolute inset-0">
-            <Image src={images.hero} alt="Hero background" fill priority sizes="100vw" className="object-cover" />
+            <Image 
+              src={images.hero} 
+              alt="Hero background" 
+              fill 
+              priority 
+              sizes="100vw" 
+              className="object-cover" 
+              loading="eager"
+              quality={90}
+            />
             <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(5,18,30,0.8)_0%,rgba(5,18,30,0.4)_45%,rgba(5,18,30,0.1)_100%)]" />
           </div>
 
@@ -189,7 +198,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               {categoriesTitle}
             </h2>
 
-            <ProductCategoriesClient categories={categories} locale={lang} isHomePage={true} />
+            <ProductCategoriesHome categories={categories} locale={lang} />
           </div>
         </section>
 
