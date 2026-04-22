@@ -359,13 +359,16 @@ export default function LogisticsAdmin() {
             </div>
             <div className="space-y-4">
               <div className="rounded-[2rem] bg-slate-900 text-white p-6 text-sm">{content.images.heroVideo}</div>
-              <CmsAssetUploadButton
-                src={content.images.heroPoster}
-                alt="Hero poster preview"
-                aspectClassName="aspect-video"
-                onUploaded={(url) => updateImage("heroPoster", url)}
-                pathPrefix="logistics"
-              />
+              <div className="space-y-2">
+                <CmsAssetUploadButton
+                  src={content.images.heroPoster}
+                  alt="Hero poster preview"
+                  aspectClassName="aspect-video"
+                  onUploaded={(url) => updateImage("heroPoster", url)}
+                  pathPrefix="logistics"
+                />
+                <p className="text-center text-[11px] font-semibold text-[#002548]/70">ขนาดแนะนำ: 1920 x 1080 px</p>
+              </div>
             </div>
           </div>
         </section>
@@ -380,13 +383,16 @@ export default function LogisticsAdmin() {
                 <input key={index} className="w-full px-5 py-4 bg-slate-50 rounded-2xl" value={point} onChange={(e) => updateSupportPoint(index, e.target.value)} placeholder={`Support point ${index + 1}`} />
               ))}
             </div>
-            <CmsAssetUploadButton
-              src={content.images.route}
-              alt="Route preview"
-              aspectClassName="aspect-[4/3]"
-              onUploaded={(url) => updateImage("route", url)}
-              pathPrefix="logistics"
-            />
+            <div className="space-y-2">
+              <CmsAssetUploadButton
+                src={content.images.route}
+                alt="Route preview"
+                aspectClassName="aspect-[4/3]"
+                onUploaded={(url) => updateImage("route", url)}
+                pathPrefix="logistics"
+              />
+              <p className="text-center text-[11px] font-semibold text-[#002548]/70">ขนาดแนะนำ: 1200 x 900 px</p>
+            </div>
           </div>
         </section>
 
@@ -418,13 +424,16 @@ export default function LogisticsAdmin() {
           <div className="p-8 space-y-5">
             <input className="w-full px-5 py-4 bg-slate-50 rounded-2xl" value={langContent.processTitle} onChange={(e) => updateLang("processTitle", e.target.value)} placeholder="Process title" />
             <textarea className="w-full px-5 py-4 bg-slate-50 rounded-2xl min-h-[140px]" value={langContent.processBody} onChange={(e) => updateLang("processBody", e.target.value)} placeholder="Process body" />
-            <CmsAssetUploadButton
-              src={content.images.packaging}
-              alt="Packaging preview"
-              aspectClassName="aspect-[4/3]"
-              onUploaded={(url) => updateImage("packaging", url)}
-              pathPrefix="logistics"
-            />
+            <div className="space-y-2">
+              <CmsAssetUploadButton
+                src={content.images.packaging}
+                alt="Packaging preview"
+                aspectClassName="aspect-[4/3]"
+                onUploaded={(url) => updateImage("packaging", url)}
+                pathPrefix="logistics"
+              />
+              <p className="text-center text-[11px] font-semibold text-[#002548]/70">ขนาดแนะนำ: 1200 x 900 px</p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {langContent.processSteps.map((step, index) => (
                 <div key={index} className="rounded-[1.5rem] border border-slate-100 p-4 space-y-3">

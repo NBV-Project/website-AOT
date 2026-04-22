@@ -1,15 +1,11 @@
 import LogisticsPage from "@/app/logistics/page";
-import { locales, type Locale } from "@/lib/locale";
+import { type Locale } from "@/lib/locale";
 
 type LocalizedPageProps = {
   params: Promise<{ lang: Locale }>;
 };
 
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-  return locales.map((lang) => ({ lang }));
-}
+export const dynamic = "force-dynamic";
 
 export default async function LocalizedLogisticsPage({
   params,

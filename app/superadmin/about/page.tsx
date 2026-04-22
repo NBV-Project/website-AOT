@@ -345,13 +345,16 @@ export default function AboutManagement() {
               <textarea className="w-full px-5 py-4 bg-slate-50 rounded-2xl min-h-[140px]" value={langContent.heroBody} onChange={(e) => updateLang("heroBody", e.target.value)} placeholder="Hero body" />
               
             </div>
-            <CmsAssetUploadButton
-              src={content.images.hero}
-              alt="About hero preview"
-              aspectClassName="aspect-video"
-              onUploaded={(url) => updateImage("hero", url)}
-              pathPrefix="about"
-            />
+            <div className="space-y-2">
+              <CmsAssetUploadButton
+                src={content.images.hero}
+                alt="About hero preview"
+                aspectClassName="aspect-video"
+                onUploaded={(url) => updateImage("hero", url)}
+                pathPrefix="about"
+              />
+              <p className="text-center text-[11px] font-semibold text-[#002548]/70">ขนาดแนะนำ: 1920 x 1080 px</p>
+            </div>
           </div>
         </section>
 
@@ -366,13 +369,16 @@ export default function AboutManagement() {
               <textarea className="w-full px-5 py-4 bg-slate-50 rounded-2xl min-h-[180px]" value={langContent.storyBody} onChange={(e) => updateLang("storyBody", e.target.value)} placeholder="Story body" />
               
             </div>
-            <CmsAssetUploadButton
-              src={content.images.story}
-              alt="About story preview"
-              aspectClassName="aspect-[4/5]"
-              onUploaded={(url) => updateImage("story", url)}
-              pathPrefix="about"
-            />
+            <div className="space-y-2">
+              <CmsAssetUploadButton
+                src={content.images.story}
+                alt="About story preview"
+                aspectClassName="aspect-[4/5]"
+                onUploaded={(url) => updateImage("story", url)}
+                pathPrefix="about"
+              />
+              <p className="text-center text-[11px] font-semibold text-[#002548]/70">ขนาดแนะนำ: 1200 x 1500 px</p>
+            </div>
           </div>
         </section>
 
@@ -689,6 +695,7 @@ export default function AboutManagement() {
                           onUploaded={(url) => updateLeader(activeLeaderIndex, "image", url)}
                           pathPrefix="about"
                         />
+                        <p className="mt-2 text-center text-[11px] font-semibold text-[#002548]/70">ขนาดแนะนำ: 1200 x 1600 px</p>
                       </div>
                       <div className="flex items-start gap-4 md:gap-5 rounded-[2rem] md:rounded-[2.5rem] bg-[#002548]/5 p-6 md:p-8 border border-[#002548]/10">
                         <div className="flex h-10 w-10 md:h-12 md:w-12 shrink-0 items-center justify-center rounded-full bg-[#002548] text-white shadow-xl mt-1">

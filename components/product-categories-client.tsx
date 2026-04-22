@@ -96,7 +96,7 @@ export function ProductCategoriesClient({ categories, locale, isHomePage = false
                 src={item.image}
                 alt={item.title}
                 fill
-                sizes="(max-width: 640px) 144px, 160px"
+                sizes="(max-width: 640px) 144px, (max-width: 768px) 160px, 160px"
                 className="object-cover transition-transform duration-500 group-hover:scale-105"
               />
               {/* Seasonal Badge */}

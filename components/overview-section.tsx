@@ -32,7 +32,7 @@ export function OverviewSection({ locale, copy, introImage }: OverviewSectionPro
               src={introImage}
               alt={copy?.overviewTitle || "Company Overview"}
               fill
-              sizes="(max-width: 1024px) 100vw, (max-width: 1536px) 45vw, 680px"
+              sizes="(max-width: 1024px) 100vw, (max-width: 1536px) 40vw, 600px"
               className="object-cover transition duration-700 hover:scale-[1.05]"
             />
           </div>

@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Script from "next/script";
-import { unstable_cache } from "next/cache";
 import { supabase } from "@/lib/supabase";
 
 import { SiteHeader } from "@/components/site-header";
@@ -177,28 +176,31 @@ const aboutCopy: Record<Locale, AboutCopy> = {
   }
 };
 
-const getAboutData = unstable_cache(
-  async () => {
-    const { data: pageData } = await supabase
-      .from("page_content")
-      .select("content")
-      .eq("page_name", "about")
-      .maybeSingle();
-
-    return pageData;
-  },
-  ["about-page-data"],
-  { revalidate: 300 }
-);
-
 type AboutProps = {
   searchParams: Promise<{ lang?: string }>;
 };
 
+export async function generateMetadata({ searchParams }: AboutProps) {
+  const resolvedSearchParams = await searchParams;
+  const lang = resolveLocale(resolvedSearchParams.lang);
+  const copy = aboutCopy[lang];
+
+  return {
+    title: `${copy.heroKicker} | Asian Overseas Trading`,
+    description: copy.heroBody,
+  };
+}
+
+export const dynamic = "force-dynamic";
+
 export default async function AboutPage({ searchParams }: AboutProps) {
   const resolvedSearchParams = await searchParams;
   const lang = resolveLocale(resolvedSearchParams.lang);
-  const pageData = await getAboutData();
+  const { data: pageData } = await supabase
+    .from("page_content")
+    .select("content")
+    .eq("page_name", "about")
+    .maybeSingle();
 
   const dbContent = (pageData?.content as Record<string, unknown>) || {};
   const dbLangContent = (dbContent[lang] as Record<string, unknown>) || {};
@@ -294,7 +296,7 @@ export default async function AboutPage({ searchParams }: AboutProps) {
             alt={copy.heroTitle.join(" ")} 
             fill 
             priority 
-            sizes="100vw" 
+            sizes="(max-width: 1280px) 100vw, 1280px" 
             className="object-cover" 
             quality={90}
           />
@@ -321,7 +323,7 @@ export default async function AboutPage({ searchParams }: AboutProps) {
                 src={images.story} 
                 alt="Fruit inspection and quality control" 
                 fill 
-                sizes="(max-width: 768px) 100vw, (max-width: 1280px) 40vw, 550px" 
+                sizes="(max-width: 768px) 100vw, (max-width: 1536px) 41vw, 640px" 
                 className="object-cover transition duration-700 group-hover:scale-105" 
                 quality={85}
               />
@@ -392,7 +394,7 @@ export default async function AboutPage({ searchParams }: AboutProps) {
                     src={leader.image}
                     alt={leader.name}
                     fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, (max-width: 1536px) 31vw, 450px"
                     loading={leader.image === "/images/team-sourcing-new.jpg" ? "eager" : "lazy"}
                     className="object-cover transition duration-700 group-hover:scale-105"
                   />

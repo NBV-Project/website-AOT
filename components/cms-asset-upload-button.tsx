@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { CMS_ASSET_BUCKET, formatStorageError } from "@/lib/storage";
 
 type CmsAssetUploadButtonProps = {
   src: string;
@@ -58,16 +59,22 @@ export function CmsAssetUploadButton({
       const extension = file.name.split(".").pop()?.toLowerCase() || "bin";
       const filename = `${pathPrefix}/${slugifyFilename(file.name)}-${Date.now()}.${extension}`;
 
-      const { error: uploadError } = await supabase.storage.from("website-assets").upload(filename, file);
+      const { error: uploadError } = await supabase.storage
+        .from(CMS_ASSET_BUCKET)
+        .upload(filename, file);
       if (uploadError) throw uploadError;
 
       const {
         data: { publicUrl },
-      } = supabase.storage.from("website-assets").getPublicUrl(filename);
+      } = supabase.storage.from(CMS_ASSET_BUCKET).getPublicUrl(filename);
 
       onUploaded(publicUrl);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Upload failed";
+      console.error("[CMS Asset Upload] Failed to upload asset", {
+        bucket: CMS_ASSET_BUCKET,
+        error,
+      });
+      const message = formatStorageError(error);
       setErrorMessage(message);
     } finally {
       setIsUploading(false);
@@ -97,7 +104,6 @@ export function CmsAssetUploadButton({
           </div>
         </div>
       </div>
-
       {errorMessage ? <p className="text-xs text-red-500">{errorMessage}</p> : null}
     </div>
   );

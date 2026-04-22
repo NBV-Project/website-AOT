@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { unstable_cache } from "next/cache";
 import { supabase } from "@/lib/supabase";
 
 import { SiteFooter } from "@/components/site-footer";
@@ -148,21 +147,22 @@ const copyByLocale: Record<Locale, ProductsCopy> = {
   }
 };
 
-const getProductsData = unstable_cache(
-  async () => {
-    const [{ data: pageData }, { data: dbProducts }] = await Promise.all([
-      supabase.from('page_content').select('content').eq('page_name', 'products_page').single(),
-      supabase.from('products').select('*').order('sort_order', { ascending: true }).order('created_at', { ascending: true }),
-    ]);
-    return { pageData, dbProducts };
-  },
-  ['products-data'],
-  { revalidate: 300 }
-);
-
 type ProductsPageProps = {
   searchParams: Promise<{ lang?: string }>;
 };
+
+export async function generateMetadata({ searchParams }: ProductsPageProps) {
+  const resolvedSearchParams = await searchParams;
+  const lang = resolveLocale(resolvedSearchParams.lang);
+  const copy = copyByLocale[lang];
+
+  return {
+    title: `${copy.heroTitle.join(" ")} | Asian Overseas Trading`,
+    description: copy.heroBody,
+  };
+}
+
+export const dynamic = "force-dynamic";
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
   const resolvedSearchParams = await searchParams;
@@ -170,7 +170,10 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   const navigation = navigationByLocale[lang];
   const brand = brandByLocale[lang];
 
-  const { pageData, dbProducts } = await getProductsData();
+  const [{ data: pageData }, { data: dbProducts }] = await Promise.all([
+    supabase.from("page_content").select("content").eq("page_name", "products_page").single(),
+    supabase.from("products").select("*").order("sort_order", { ascending: true }).order("created_at", { ascending: true }),
+  ]);
 
   const dbContent = pageData?.content || {};
   const langContent = dbContent[lang] || {};
@@ -217,7 +220,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
               alt="Products hero" 
               fill 
               priority 
-              sizes="100vw" 
+              sizes="(max-width: 1440px) 100vw, 1440px" 
               className="object-cover" 
               loading="eager"
             />
@@ -257,7 +260,13 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
               {(copy.showcaseItems || []).map((item: { title: string; body: string; image: string; imageBg: string }, index: number) => (
                 <article key={item.title} className="overflow-hidden rounded-[2rem] border border-[#d9dfce] bg-[#f7f8f2] shadow-[0_18px_48px_rgba(0,37,72,0.08)]">
                   <div className="relative min-h-[20rem] overflow-hidden sm:min-h-[23rem] lg:min-h-[26rem]" style={{ backgroundColor: item.imageBg }}>
-                    <Image src={item.image || (index === 0 ? images.showcaseOne : images.showcaseTwo)} alt={item.title} fill sizes="(max-width: 1024px) 100vw, 48vw" className="object-contain transition duration-700 hover:scale-[1.05]" />
+                    <Image 
+                      src={item.image || (index === 0 ? images.showcaseOne : images.showcaseTwo)} 
+                      alt={item.title} 
+                      fill 
+                      sizes="(max-width: 1024px) 94vw, (max-width: 1536px) 45vw, 700px" 
+                      className="object-contain transition duration-700 hover:scale-[1.05]" 
+                    />
                   </div>
                   <div className="p-8">
                     <h3 className="font-[family-name:var(--font-montserrat)] text-2xl font-semibold text-[var(--brand-primary)] sm:text-[2rem]">{item.title}</h3>
@@ -286,7 +295,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                   src={images.flagship} 
                   alt={copy.flagshipTitle} 
                   fill 
-                  sizes="(max-width: 1024px) 100vw, (max-width: 1536px) 52vw, 800px" 
+                  sizes="(max-width: 1024px) 94vw, (max-width: 1536px) 51vw, 780px" 
                   className="object-cover" 
                 />
               </div>

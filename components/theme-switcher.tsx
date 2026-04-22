@@ -16,6 +16,11 @@ function getServerSnapshot(): "cool" | "gold" {
 }
 
 export function ThemeSwitcher() {
+  const hydrated = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
   const theme = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   useEffect(() => {
@@ -36,7 +41,8 @@ export function ThemeSwitcher() {
     <button
       onClick={toggleTheme}
       className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/8 text-white transition hover:bg-white/14 shrink-0"
-      title={theme === "cool" ? "Switch to Warm Gold Theme" : "Switch to Cool Navy Theme"}
+      title={!hydrated ? "Theme Switcher" : theme === "cool" ? "Switch to Warm Gold Theme" : "Switch to Cool Navy Theme"}
+      suppressHydrationWarning
     >
       <svg
         className="h-5 w-5"

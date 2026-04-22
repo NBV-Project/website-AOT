@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { SuperAdminLayoutClient } from "@/components/superadmin-layout-client";
 
 export default function SuperAdminLayout({
@@ -6,5 +6,9 @@ export default function SuperAdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <SuperAdminLayoutClient>{children}</SuperAdminLayoutClient>;
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-50" />}>
+      <SuperAdminLayoutClient>{children}</SuperAdminLayoutClient>
+    </Suspense>
+  );
 }

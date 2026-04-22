@@ -1,5 +1,6 @@
 // Server Component — no 'use client' directive
 import Link from "next/link";
+import { Suspense } from "react";
 
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { ThemeSwitcher } from "@/components/theme-switcher";
@@ -54,7 +55,9 @@ export function SiteHeader({ activeHref, brand, currentLocale, navigation }: Sit
 
         <div className="flex items-center gap-2 sm:gap-3">
           <ThemeSwitcher />
-          <LanguageSwitcher currentLocale={currentLocale} />
+          <Suspense fallback={<div className="w-10 h-10 sm:w-12 sm:h-12" />}>
+            <LanguageSwitcher currentLocale={currentLocale} />
+          </Suspense>
           {/* Only interactive client island: mobile hamburger + overlay */}
           <MobileMenuButton
             navigation={navigation}

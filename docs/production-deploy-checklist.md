@@ -11,6 +11,9 @@ Updated: 2026-04-19
   - Public Supabase project URL
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
   - Public anon key used by the current app code
+- `NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET`
+  - Public Storage bucket name used by the CMS media uploader
+  - Default in code is `website-assets`
 
 Use `.env.example` as the minimal template for a new environment.
 
@@ -31,6 +34,11 @@ Use `.env.example` as the minimal template for a new environment.
 - Confirm no internal public navigation still links to the legacy non-locale paths
 
 ## Media/CDN work before production
+
+- Confirm the Supabase Storage bucket exists in the production project:
+  - Bucket name must match `NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET`
+  - If you keep the default, create `website-assets`
+  - For CMS uploads, the bucket should be public or have policies that allow the current client flow
 
 - Re-encode the largest assets before deploy:
   - `public/images/team-logistics.jpg`

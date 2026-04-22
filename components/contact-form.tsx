@@ -152,6 +152,7 @@ export function ContactForm({ copy, lang }: ContactFormProps) {
               onChange={handleChange}
               placeholder={copy.placeholders.name}
               className="w-full border-0 border-b border-slate-300 bg-transparent px-0 py-4 text-sm placeholder:text-slate-300 focus:border-b-2 focus:border-[#002548] focus:ring-0"
+              suppressHydrationWarning
             />
           </div>
           <div>
@@ -166,6 +167,7 @@ export function ContactForm({ copy, lang }: ContactFormProps) {
               onChange={handleChange}
               placeholder={copy.placeholders.email}
               className="w-full border-0 border-b border-slate-300 bg-transparent px-0 py-4 text-sm placeholder:text-slate-300 focus:border-b-2 focus:border-[#002548] focus:ring-0"
+              suppressHydrationWarning
             />
           </div>
         </div>
@@ -180,6 +182,7 @@ export function ContactForm({ copy, lang }: ContactFormProps) {
               value={formData.subject}
               onChange={handleChange}
               className="w-full appearance-none border-0 border-b border-slate-300 bg-transparent px-0 py-4 text-sm focus:border-b-2 focus:border-[#002548] focus:ring-0"
+              suppressHydrationWarning
             >
               {copy.options.map((option) => (
                 <option key={option} value={option}>{option}</option>
@@ -197,6 +200,7 @@ export function ContactForm({ copy, lang }: ContactFormProps) {
               onChange={handleChange}
               placeholder={copy.placeholders.timeline}
               className="w-full border-0 border-b border-slate-300 bg-transparent px-0 py-4 text-sm placeholder:text-slate-300 focus:border-b-2 focus:border-[#002548] focus:ring-0"
+              suppressHydrationWarning
             />
           </div>
         </div>
@@ -212,6 +216,7 @@ export function ContactForm({ copy, lang }: ContactFormProps) {
             onChange={handleChange}
             placeholder={copy.placeholders.details}
             className="w-full resize-none border-0 border-b border-slate-300 bg-transparent px-0 py-4 text-sm placeholder:text-slate-300 focus:border-b-2 focus:border-[#002548] focus:ring-0"
+            suppressHydrationWarning
           />
         </div>
 
@@ -219,6 +224,7 @@ export function ContactForm({ copy, lang }: ContactFormProps) {
           disabled={isLoading}
           type="submit"
           className="inline-flex min-w-[10rem] items-center justify-center rounded-md border-2 border-[#002548] bg-transparent px-7 py-4 text-center font-[family-name:var(--font-montserrat)] text-base font-medium text-[#002548] transition duration-300 hover:-translate-y-0.5 hover:border-[#003366] hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+          suppressHydrationWarning
         >
           {isLoading ? (
             <span className="flex items-center gap-2">

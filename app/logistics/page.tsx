@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { unstable_cache } from "next/cache";
 
 import { HeroBackgroundVideo } from "@/components/hero-background-video";
 import { LogisticsChinaMapClient as LogisticsChinaMap } from "@/components/logistics-china-map-client";
@@ -331,30 +330,34 @@ const heroSecondaryCtaByLocale: Record<Locale, string> = {
   zh: "查看运输网络",
 };
 
-type LogisticsProps = {
+type LogisticsPageProps = {
   searchParams: Promise<{ lang?: string }>;
 };
 
-const getLogisticsData = unstable_cache(
-  async () => {
-    const { data } = await supabase
-      .from("page_content")
-      .select("content")
-      .eq("page_name", "logistics")
-      .maybeSingle();
+export async function generateMetadata({ searchParams }: LogisticsPageProps) {
+  const resolvedSearchParams = await searchParams;
+  const lang = resolveLocale(resolvedSearchParams.lang);
+  const copy = copyByLocale[lang];
 
-    return data;
-  },
-  ["logistics-page-data"],
-  { revalidate: 300 },
-);
+  return {
+    title: `${copy.heroTitle.join(" ")} | Asian Overseas Trading`,
+    description: copy.heroBody,
+  };
+}
 
-export default async function LogisticsPage({ searchParams }: LogisticsProps) {
+export const dynamic = "force-dynamic";
+
+
+export default async function LogisticsPage({ searchParams }: LogisticsPageProps) {
   const resolvedSearchParams = await searchParams;
   const lang = resolveLocale(resolvedSearchParams.lang);
   const navigation = navigationByLocale[lang];
   const brand = brandByLocale[lang];
-  const pageData = await getLogisticsData();
+  const { data: pageData } = await supabase
+    .from("page_content")
+    .select("content")
+    .eq("page_name", "logistics")
+    .maybeSingle();
   const dbContent = pageData?.content || {};
   const langContent = dbContent[lang] || {};
   const defaultCopy = copyByLocale[lang];

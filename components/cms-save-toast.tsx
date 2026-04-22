@@ -135,9 +135,9 @@ export function CmsSaveToast({ status, onClear, messages }: CmsSaveToastProps) {
 
   return (
     <AdminPortal>
-      <div className="pointer-events-none fixed right-4 top-32 z-[9999] w-fit max-w-[280px] md:right-10">
+      <div className="pointer-events-none fixed right-4 top-20 z-[9999] w-fit max-w-[304px] sm:right-5 sm:top-22 md:right-6 md:top-24 lg:right-7 lg:top-24">
         <div
-          className={`pointer-events-auto overflow-hidden rounded-xl border shadow-[0_12px_30px_rgba(0,37,72,0.1)] transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] ${
+          className={`pointer-events-auto overflow-hidden rounded-xl border transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] ${
             tone.container
           } ${
             isVisible
@@ -147,19 +147,21 @@ export function CmsSaveToast({ status, onClear, messages }: CmsSaveToastProps) {
           role="status"
           aria-live="polite"
         >
-          <div className="flex items-center gap-3 py-2.5 pl-3 pr-2">
-            <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${tone.iconWrap}`}>
+          <div className="flex items-center gap-3 py-2.5 pl-3.5 pr-2.5 sm:gap-3.5 sm:py-3 sm:pl-3.5 sm:pr-2.5">
+            <span className={`flex h-7.5 w-7.5 shrink-0 items-center justify-center rounded-lg ${tone.iconWrap}`}>
               {tone.icon}
             </span>
-            <div className="min-w-[120px] flex-1">
-              <p className="text-[8px] font-black uppercase tracking-[0.15em] opacity-40 leading-none">
+            <div className="min-w-[144px] flex-1 sm:min-w-[164px]">
+              <p className="text-[9px] font-black uppercase tracking-[0.18em] opacity-40 leading-none">
                 {tone.label}
               </p>
-              <p className="mt-1 text-[11px] font-bold tracking-tight leading-none text-current">{tone.message}</p>
+              <p className="mt-1 text-[11px] font-bold tracking-tight leading-snug text-current sm:text-[12px]">
+                {tone.message}
+              </p>
             </div>
             <button 
               onClick={onClear}
-              className="p-1 hover:bg-slate-100 rounded-md transition-colors text-slate-300 hover:text-slate-600"
+              className="rounded-md p-1 text-slate-300 transition-colors hover:bg-slate-100 hover:text-slate-600"
             >
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>

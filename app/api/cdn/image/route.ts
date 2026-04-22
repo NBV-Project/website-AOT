@@ -17,16 +17,20 @@ export async function GET(request: NextRequest) {
     const filePath = path.join(process.cwd(), "public", src);
     const imageBuffer = await fs.readFile(filePath);
 
+    const acceptHeader = request.headers.get("accept") || "";
+    const supportsAvif = acceptHeader.includes("image/avif");
+    const format = supportsAvif ? "avif" : "webp";
+
     const optimizedImage = await sharp(imageBuffer)
       .resize({ width, withoutEnlargement: true })
-      .webp({ quality })
+      [format]({ quality })
       .toBuffer();
 
     const body = new Uint8Array(optimizedImage);
 
     return new NextResponse(body, {
       headers: {
-        "Content-Type": "image/webp",
+        "Content-Type": `image/${format}`,
         "Cache-Control": "public, max-age=31536000, immutable",
       },
     });

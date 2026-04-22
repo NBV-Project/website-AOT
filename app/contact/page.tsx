@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { unstable_cache } from "next/cache";
 
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -178,30 +177,34 @@ const copyByLocale: Record<Locale, ContactCopy> = {
   },
 };
 
-type ContactProps = {
+type ContactPageProps = {
   searchParams: Promise<{ lang?: string }>;
 };
 
-const getContactData = unstable_cache(
-  async () => {
-    const { data } = await supabase
-      .from("page_content")
-      .select("content")
-      .eq("page_name", "contact")
-      .maybeSingle();
+export async function generateMetadata({ searchParams }: ContactPageProps) {
+  const resolvedSearchParams = await searchParams;
+  const lang = resolveLocale(resolvedSearchParams.lang);
+  const copy = copyByLocale[lang];
 
-    return data;
-  },
-  ["contact-page-data"],
-  { revalidate: 300 },
-);
+  return {
+    title: `${copy.heroTitle.join(" ")} | Asian Overseas Trading`,
+    description: copy.heroBody,
+  };
+}
 
-export default async function ContactPage({ searchParams }: ContactProps) {
+export const dynamic = "force-dynamic";
+
+
+export default async function ContactPage({ searchParams }: ContactPageProps) {
   const resolvedSearchParams = await searchParams;
   const lang = resolveLocale(resolvedSearchParams.lang);
   const navigation = navigationByLocale[lang];
   const brand = brandByLocale[lang];
-  const pageData = await getContactData();
+  const { data: pageData } = await supabase
+    .from("page_content")
+    .select("content")
+    .eq("page_name", "contact")
+    .maybeSingle();
   const dbContent = pageData?.content || {};
   const langContent = dbContent[lang] || {};
   const defaultCopy = copyByLocale[lang];
@@ -231,7 +234,7 @@ export default async function ContactPage({ searchParams }: ContactProps) {
               alt="Contact hero" 
               fill 
               priority 
-              sizes="100vw" 
+              sizes="(max-width: 1536px) 100vw, 1536px" 
               className="object-cover" 
               loading="eager"
               quality={90}
@@ -296,7 +299,7 @@ export default async function ContactPage({ searchParams }: ContactProps) {
                     src={images.office}
                     alt={copy.officeTitle}
                     fill
-                    sizes="(max-width: 1024px) 100vw, (max-width: 1536px) 38vw, 580px"
+                    sizes="(max-width: 1024px) 100vw, (max-width: 1536px) 41vw, 600px"
                     className="object-cover transition duration-700 hover:scale-[1.02]"
                     quality={85}
                   />

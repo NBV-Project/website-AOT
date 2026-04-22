@@ -47,6 +47,34 @@ DROP POLICY IF EXISTS "Enable all access for now" ON contact_inquiries;
 CREATE POLICY "Enable all access for now" ON contact_inquiries FOR ALL USING (true);
 
 -- 5. ข้อมูลสินค้าตัวอย่าง (Seed Data)
+-- 5. สร้าง Supabase Storage bucket สำหรับ CMS media
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('website-assets', 'website-assets', true)
+ON CONFLICT (id) DO UPDATE
+SET name = EXCLUDED.name,
+    public = EXCLUDED.public;
+
+DROP POLICY IF EXISTS "Public read website assets" ON storage.objects;
+CREATE POLICY "Public read website assets"
+ON storage.objects
+FOR SELECT
+TO public
+USING (bucket_id = 'website-assets');
+
+DROP POLICY IF EXISTS "Public upload website assets" ON storage.objects;
+CREATE POLICY "Public upload website assets"
+ON storage.objects
+FOR INSERT
+TO public
+WITH CHECK (bucket_id = 'website-assets');
+
+DROP POLICY IF EXISTS "Public delete website assets" ON storage.objects;
+CREATE POLICY "Public delete website assets"
+ON storage.objects
+FOR DELETE
+TO public
+USING (bucket_id = 'website-assets');
+
 TRUNCATE products;
 
 INSERT INTO products (image_url, is_in_season, th, en, zh) 

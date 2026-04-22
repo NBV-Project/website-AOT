@@ -350,13 +350,16 @@ export default function ContactAdmin() {
               <textarea className="w-full px-5 py-4 bg-slate-50 rounded-2xl min-h-[120px]" value={langContent.introBody} onChange={(e) => updateLang("introBody", e.target.value)} placeholder="Intro body" />
               
             </div>
-            <CmsAssetUploadButton
-              src={content.images.hero}
-              alt="Contact hero preview"
-              aspectClassName="aspect-video"
-              onUploaded={(url) => updateImage("hero", url)}
-              pathPrefix="contact"
-            />
+            <div className="space-y-2">
+              <CmsAssetUploadButton
+                src={content.images.hero}
+                alt="Contact hero preview"
+                aspectClassName="aspect-video"
+                onUploaded={(url) => updateImage("hero", url)}
+                pathPrefix="contact"
+              />
+              <p className="text-center text-[11px] font-semibold text-[#002548]/70">ขนาดแนะนำ: 1920 x 1080 px</p>
+            </div>
           </div>
         </section>
 
@@ -374,13 +377,16 @@ export default function ContactAdmin() {
               ))}
               
             </div>
-            <CmsAssetUploadButton
-              src={content.images.office}
-              alt="Office preview"
-              aspectClassName="aspect-[4/3]"
-              onUploaded={(url) => updateImage("office", url)}
-              pathPrefix="contact"
-            />
+            <div className="space-y-2">
+              <CmsAssetUploadButton
+                src={content.images.office}
+                alt="Office preview"
+                aspectClassName="aspect-[4/3]"
+                onUploaded={(url) => updateImage("office", url)}
+                pathPrefix="contact"
+              />
+              <p className="text-center text-[11px] font-semibold text-[#002548]/70">ขนาดแนะนำ: 1200 x 900 px</p>
+            </div>
           </div>
         </section>
 

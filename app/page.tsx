@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { unstable_cache } from "next/cache";
 import { supabase } from "@/lib/supabase";
 
 import { SiteHeader } from "@/components/site-header";
@@ -90,17 +89,7 @@ type HomePageProps = {
   searchParams: Promise<{ lang?: string }>;
 };
 
-const getHomeData = unstable_cache(
-  async () => {
-    const [{ data: pageData }, { data: dbProducts }] = await Promise.all([
-      supabase.from('page_content').select('content').eq('page_name', 'home').single(),
-      supabase.from('products').select('*').order('sort_order', { ascending: true }).order('created_at', { ascending: true }),
-    ]);
-    return { pageData, dbProducts };
-  },
-  ['home-data'],
-  { revalidate: 3600 }
-);
+export const dynamic = "force-dynamic";
 
 export default async function HomePage({ searchParams }: HomePageProps) {
   const resolvedSearchParams = await searchParams;
@@ -108,7 +97,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const navigation = navigationByLocale[lang];
   const brand = brandByLocale[lang];
 
-  const { pageData, dbProducts } = await getHomeData();
+  const [{ data: pageData }, { data: dbProducts }] = await Promise.all([
+    supabase.from("page_content").select("content").eq("page_name", "home").single(),
+    supabase.from("products").select("*").order("sort_order", { ascending: true }).order("created_at", { ascending: true }),
+  ]);
 
   const dbContent = pageData?.content || {};
   const langCopy = dbContent[lang] || {};
@@ -154,7 +146,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               alt="Hero background" 
               fill 
               priority 
-              sizes="100vw" 
+              sizes="(max-width: 1440px) 100vw, 1440px" 
               className="object-cover" 
               loading="eager"
               quality={90}

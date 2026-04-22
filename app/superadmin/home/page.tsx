@@ -481,9 +481,7 @@ export default function HomeEditor() {
                 pathPrefix="home"
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
-              <p className="text-center text-[9px] font-medium italic text-slate-400 opacity-60 underline underline-offset-4 sm:text-[10px]">
-                แนะนำขนาด: 1920 x 1080 px
-              </p>
+              <p className="mt-2 text-center text-[11px] font-semibold text-[#002548]/70">ขนาดแนะนำ: 1920 x 1080 px</p>
             </div>
           </div>
         </div>
@@ -541,9 +539,7 @@ export default function HomeEditor() {
                 pathPrefix="home"
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
-              <p className="text-center text-[9px] font-medium italic text-slate-400 opacity-60 underline underline-offset-4 sm:text-[10px]">
-                แนะนำขนาด: 1200 x 900 px
-              </p>
+              <p className="mt-2 text-center text-[11px] font-semibold text-[#002548]/70">ขนาดแนะนำ: 1200 x 900 px</p>
             </div>
 
             <div className="order-1 space-y-6 text-[16px] sm:space-y-8 lg:order-2">
@@ -705,6 +701,7 @@ export default function HomeEditor() {
                             onUploaded={(url) => updateOverviewDetail(activeDetailIndex, "image", url)}
                             pathPrefix="home"
                           />
+                          <p className="mt-2 text-center text-[11px] font-semibold text-[#002548]/70">ขนาดแนะนำ: 1200 x 900 px</p>
                         </div>
                         <div className="flex items-center gap-4 rounded-[2rem] bg-[#002548]/5 p-6 border border-[#002548]/10">
                           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#002548] text-white shadow-lg">

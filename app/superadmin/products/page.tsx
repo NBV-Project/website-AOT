@@ -444,13 +444,16 @@ export default function ProductManagement() {
                 <input className="w-full px-5 py-4 bg-slate-50 rounded-2xl" value={page.secondaryCta} onChange={(e) => updatePageField("secondaryCta", e.target.value)} placeholder="Secondary CTA" />
               </div>
             </div>
-            <CmsAssetUploadButton
-              src={pageContent.images.hero}
-              alt="Products hero preview"
-              aspectClassName="aspect-video"
-              onUploaded={(url) => updateImage("hero", url)}
-              pathPrefix="products"
-            />
+            <div className="space-y-2">
+              <CmsAssetUploadButton
+                src={pageContent.images.hero}
+                alt="Products hero preview"
+                aspectClassName="aspect-video"
+                onUploaded={(url) => updateImage("hero", url)}
+                pathPrefix="products"
+              />
+              <p className="text-center text-[11px] font-semibold text-[#002548]/70">ขนาดแนะนำ: 1920 x 1080 px</p>
+            </div>
           </div>
         </section>
 
@@ -467,13 +470,16 @@ export default function ProductManagement() {
                 <input key={index} className="w-full px-5 py-4 bg-slate-50 rounded-2xl" value={point} onChange={(e) => updateFlagshipPoint(index, e.target.value)} placeholder={`Flagship point ${index + 1}`} />
               ))}
             </div>
-            <CmsAssetUploadButton
-              src={pageContent.images.flagship}
-              alt="Flagship preview"
-              aspectClassName="aspect-[4/3]"
-              onUploaded={(url) => updateImage("flagship", url)}
-              pathPrefix="products"
-            />
+            <div className="space-y-2">
+              <CmsAssetUploadButton
+                src={pageContent.images.flagship}
+                alt="Flagship preview"
+                aspectClassName="aspect-[4/3]"
+                onUploaded={(url) => updateImage("flagship", url)}
+                pathPrefix="products"
+              />
+              <p className="text-center text-[11px] font-semibold text-[#002548]/70">ขนาดแนะนำ: 1200 x 900 px</p>
+            </div>
           </div>
         </section>
 
@@ -560,6 +566,7 @@ export default function ProductManagement() {
                         }}
                         pathPrefix="products"
                       />
+                      <p className="mt-2 text-center text-[11px] font-semibold text-[#002548]/70">ขนาดแนะนำ: 1600 x 900 px</p>
                     </div>
 
                     {/* Content Section */}
@@ -702,6 +709,7 @@ export default function ProductManagement() {
                       onUploaded={(url) => setEditingProduct({ ...editingProduct, image_url: url })}
                       pathPrefix="products"
                     />
+                    <p className="mt-2 text-center text-[11px] font-semibold text-[#002548]/70">ขนาดแนะนำ: 1200 x 1200 px</p>
                     <label className="flex items-center gap-3 text-sm text-slate-600">
                       <input type="checkbox" checked={editingProduct.is_in_season} onChange={() => setEditingProduct({ ...editingProduct, is_in_season: !editingProduct.is_in_season })} />
                       In season

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
+import { CMS_ASSET_BUCKET, formatStorageError } from "@/lib/storage";
 import { CheckCircle2, AlertTriangle, Loader2, CloudUpload, ImageIcon, Link2, Trash2, Diamond } from "lucide-react";
 
 interface MediaFile {
@@ -26,20 +27,24 @@ export default function MediaLibraryPage() {
   const fetchFiles = useCallback(async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase.storage.from('website-assets').list('', {
+      const { data, error } = await supabase.storage.from(CMS_ASSET_BUCKET).list('', {
         limit: 100,
         offset: 0,
         sortBy: { column: 'updated_at', order: 'desc' },
       });
 
       if (error) {
-        console.error("Error fetching files:", error);
+        console.error("[Media Library] Error fetching files", {
+          bucket: CMS_ASSET_BUCKET,
+          error,
+        });
+        showNotification('error', formatStorageError(error));
         return;
       }
 
       if (data) {
         const filesWithUrls = data.map((file) => {
-          const { data: { publicUrl } } = supabase.storage.from('website-assets').getPublicUrl(file.name);
+          const { data: { publicUrl } } = supabase.storage.from(CMS_ASSET_BUCKET).getPublicUrl(file.name);
           return {
             ...file,
             url: publicUrl,
@@ -48,7 +53,11 @@ export default function MediaLibraryPage() {
         setFiles(filesWithUrls);
       }
     } catch (err) {
-      console.error("Unexpected error:", err);
+      console.error("[Media Library] Unexpected error while listing files", {
+        bucket: CMS_ASSET_BUCKET,
+        error: err,
+      });
+      showNotification('error', formatStorageError(err));
     } finally {
       setLoading(false);
     }
@@ -81,7 +90,7 @@ export default function MediaLibraryPage() {
       const filePath = `${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('website-assets')
+        .from(CMS_ASSET_BUCKET)
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;
@@ -89,7 +98,11 @@ export default function MediaLibraryPage() {
       showNotification('success', 'อัปโหลดรูปภาพสำเร็จ');
       fetchFiles();
     } catch (error: unknown) {
-      const msg = error instanceof Error ? error.message : "Unknown error";
+      console.error("[Media Library] Error uploading file", {
+        bucket: CMS_ASSET_BUCKET,
+        error,
+      });
+      const msg = formatStorageError(error);
       showNotification('error', `เกิดข้อผิดพลาด: ${msg}`);
     } finally {
       setUploading(false);
@@ -116,12 +129,16 @@ export default function MediaLibraryPage() {
     if (!confirm('คุณแน่ใจหรือไม่ว่าต้องการลบรูปภาพนี้?')) return;
 
     try {
-      const { error } = await supabase.storage.from('website-assets').remove([name]);
+      const { error } = await supabase.storage.from(CMS_ASSET_BUCKET).remove([name]);
       if (error) throw error;
       showNotification('success', 'ลบรูปภาพเรียบร้อยแล้ว');
       fetchFiles();
     } catch (error: unknown) {
-      const msg = error instanceof Error ? error.message : "Unknown error";
+      console.error("[Media Library] Error deleting file", {
+        bucket: CMS_ASSET_BUCKET,
+        error,
+      });
+      const msg = formatStorageError(error);
       showNotification('error', `ลบไม่สำเร็จ: ${msg}`);
     }
   };
